@@ -36,8 +36,10 @@
             padding: 2rem;
             position: relative;
             overflow: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
+        /* Hacker background animation */
         .hacker-background {
             position: fixed;
             top: 0;
@@ -56,8 +58,9 @@
             opacity: 0.1;
         }
 
+        /* Terminal-style container */
         .container {
-            background-color: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.7);
             border: 1px solid var(--primary);
             border-radius: 8px;
             padding: 2rem;
@@ -96,6 +99,7 @@
             50% { opacity: 1; }
         }
 
+        /* Password display */
         .password-display {
             background: transparent;
             border: 1px solid var(--primary);
@@ -105,7 +109,7 @@
             color: var(--primary);
             position: relative;
             margin-bottom: 1.5rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .password-display:hover {
@@ -121,12 +125,13 @@
             font-size: 1.2rem;
             font-weight: bold;
             outline: none;
+            cursor: pointer;
         }
 
         .password-display .controls {
             position: absolute;
-            right: 1rem;
-            top: 1rem;
+            right: 10px;
+            top: 10px;
             display: flex;
             gap: 0.5rem;
         }
@@ -138,15 +143,16 @@
             padding: 0.4rem 0.6rem;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .password-display .controls button:hover {
-            background-color: var(--primary);
+            background: var(--primary);
             color: var(--dark);
             border-color: var(--primary);
         }
 
+        /* Generate button */
         .generate-btn {
             width: 100%;
             padding: 1rem;
@@ -159,7 +165,12 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px var(--secondary);
         }
 
         .generate-btn::before {
@@ -173,14 +184,24 @@
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
             pointer-events: none;
-            transition: transform 0.5s, opacity 0.5s;
         }
 
         .generate-btn.animate::before {
-            transform: translate(-50%, -50%) scale(10);
-            opacity: 0;
+            animation: ripple 0.6s ease-out;
         }
 
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(10);
+                opacity: 0;
+            }
+        }
+
+        /* Strength meter */
         .strength-meter {
             height: 10px;
             background: var(--gray);
@@ -193,7 +214,6 @@
         .strength-meter-fill {
             height: 100%;
             width: 0%;
-            background: var(--primary);
             transition: all 0.5s ease-out;
         }
 
@@ -204,25 +224,15 @@
             margin-bottom: 0.5rem;
         }
 
-        .crack-time {
-            font-size: 0.9rem;
+        /* Options */
+        .options-section {
             margin-bottom: 1.5rem;
-            text-align: center;
         }
 
-        .options {
-            margin-bottom: 2rem;
-        }
-
-        .option {
+        .option-row {
             display: flex;
             align-items: center;
             margin-bottom: 0.8rem;
-        }
-
-        .option label {
-            margin-left: 0.5rem;
-            cursor: pointer;
         }
 
         .slider-container {
@@ -232,11 +242,11 @@
             margin-bottom: 1.5rem;
         }
 
-        .slider-container input[type="range"] {
-            flex: 1;
-            margin-left: 1rem;
+        .slider-container .length-value {
+            min-width: 30px;
         }
 
+        /* Feedback */
         .feedback {
             margin-top: 1rem;
             font-size: 0.9rem;
@@ -248,60 +258,49 @@
             margin-bottom: 0.5rem;
         }
 
-        .feedback li::before {
-            content: '⚠️';
+        .feedback li span.feedback-icon {
             margin-right: 0.5rem;
-            color: var(--moderate);
         }
 
-        .history {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-
-        .history h3 {
-            margin-bottom: 0.5rem;
-        }
-
-        .history ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .history li {
-            cursor: pointer;
-            padding: 0.3rem 0;
-            transition: color 0.3s;
-        }
-
-        .history li:hover {
-            color: var(--secondary);
-        }
-
-        .requirements {
+        /* Requirements check */
+        .requirements-check {
             margin-top: 1.5rem;
         }
 
-        .requirements li {
+        .requirement {
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
         }
 
-        .requirements li::before {
-            content: '❌';
+        .requirement span.requirement-icon {
             margin-right: 0.5rem;
-            color: var(--very-weak);
-            transition: all 0.3s;
         }
 
-        .requirements li.met::before {
-            content: '✅';
-            color: var(--very-strong);
+        .requirement.met span.requirement-icon {
+            color: var(--success);
         }
 
+        .requirement.unmet span.requirement-icon {
+            color: var(--danger);
+        }
+
+        /* History section */
+        .history-section {
+            margin-top: 1.5rem;
+        }
+
+        .history-item {
+            cursor: pointer;
+            padding: 0.3rem 0;
+            transition: color 0.3s;
+        }
+
+        .history-item:hover {
+            color: var(--secondary);
+        }
+
+        /* Visual hash representation */
         .visual-hash {
             width: 100px;
             height: 100px;
@@ -311,49 +310,38 @@
             border-radius: 4px;
         }
 
+        /* Security persona */
         .security-persona {
             text-align: center;
             margin-top: 1rem;
             font-size: 0.9rem;
-        }
-
-        .security-persona span {
-            display: inline-block;
-            margin: 0.5rem 0;
             font-weight: bold;
         }
 
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 2;
+        /* Crack time display */
+        .crack-time {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            font-style: italic;
         }
 
+        /* Dark mode toggle */
         .mode-toggle {
             position: absolute;
             top: 1rem;
             right: 1rem;
             cursor: pointer;
-            font-size: 1.2rem;
         }
 
-        .dark-mode .mode-toggle {
-            color: var(--primary);
-        }
-
+        /* Light mode styles */
         .light-mode {
             background-color: var(--light);
             color: var(--dark);
         }
 
-        .light-mode .password-display input {
-            color: var(--dark);
-        }
-
         .light-mode .password-display {
+            color: var(--dark);
             border-color: var(--dark);
         }
 
@@ -369,21 +357,26 @@
         }
 
         .light-mode .strength-meter {
-            background: #ddd;
+            background-color: #ddd;
         }
 
-        .light-mode .requirements li::before {
-            color: #ff0000;
+        .light-mode .requirement span.requirement-icon.fas.fa-check {
+            color: var(--success);
         }
 
-        .light-mode .requirements li.met::before {
-            color: #00ff00;
+        .light-mode .requirement span.requirement-icon.fas.fa-times {
+            color: var(--danger);
         }
 
         .light-mode .security-persona {
-            color: #333;
+            color: var(--dark);
         }
 
+        .light-mode .crack-time {
+            color: var(--dark);
+        }
+
+        /* Card layout for extra features */
         .feature-cards {
             margin-top: 2rem;
             display: grid;
@@ -409,31 +402,17 @@
             margin-bottom: 0.5rem;
         }
 
-        .footer {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            text-align: center;
-            color: var(--primary);
+        /* Confetti animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
         }
 
-        .footer.light-mode {
-            color: #333;
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotate(0); }
-            100% { transform: translateY(100vh) rotate(360deg); }
-        }
-
+        /* Responsive design */
         @media (max-width: 600px) {
             .container {
                 padding: 1rem;
@@ -443,9 +422,24 @@
                 font-size: 1.5rem;
             }
         }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes confetti-fall {
+            from {
+                transform: translateY(0) rotate(0);
+            }
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body class="dark-mode">
+    <!-- Hacker background -->
     <div class="hacker-background" id="hackerBackground"></div>
 
     <div class="container">
@@ -453,6 +447,7 @@
 
         <h1>Password Generator</h1>
 
+        <!-- Password display -->
         <div class="password-display" id="passwordDisplay">
             <input type="text" id="passwordInput" readonly>
             <div class="controls">
@@ -460,95 +455,108 @@
             </div>
         </div>
 
-        <canvas class="visual-hash" id="visualHash"></canvas>
+        <!-- Canvas for visual hash -->
+        <canvas class="visual-hash" id="visualHash" width="100" height="100"></canvas>
 
+        <!-- Security persona -->
         <div class="security-persona" id="securityPersona">
             <span>🛡️ Fort Knox Defender</span>
         </div>
 
+        <!-- Generate button -->
         <button class="generate-btn" id="generateBtn">GENERATE PASSWORD</button>
 
-        <div class="strength-label" id="strengthLabel">
-            <span id="strengthText">Very Weak 🔴</span>
-            <span id="strengthScore">0%</span>
-        </div>
-
-        <div class="strength-meter">
-            <div class="strength-meter-fill" id="strengthMeter"></div>
-        </div>
-
-        <div class="crack-time" id="crackTime">
-            Estimated crack time: N/A
-        </div>
-
-        <div class="requirements" id="requirements">
-            <h3>Password Requirements:</h3>
-            <ul>
-                <li id="req-length">Minimum 8 characters</li>
-                <li id="req-uppercase">At least one uppercase letter</li>
-                <li id="req-lowercase">At least one lowercase letter</li>
-                <li id="req-number">At least one number</li>
-                <li id="req-symbol">At least one special character</li>
-                <li id="req-ambiguous">No ambiguous characters (lI1O0)</li>
-            </ul>
-        </div>
-
-        <div class="slider-container">
-            <label for="lengthSlider">Password Length: <span id="lengthValue">12</span></label>
-            <input type="range" id="lengthSlider" min="4" max="64" value="12">
-        </div>
-
-        <div class="options">
-            <div class="option">
-                <input type="checkbox" id="uppercaseCheck" checked>
-                <label for="uppercaseCheck">Include Uppercase Letters (A-Z)</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="lowercaseCheck" checked>
-                <label for="lowercaseCheck">Include Lowercase Letters (a-z)</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="numbersCheck" checked>
-                <label for="numbersCheck">Include Numbers (0-9)</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="symbolsCheck" checked>
-                <label for="symbolsCheck">Include Symbols (!@#$%^&*)</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="excludeAmbiguousCheck" checked>
-                <label for="excludeAmbiguousCheck">Exclude Ambiguous Characters (lI1O0)</label>
-            </div>
-        </div>
-
-        <div class="options">
-            <button id="passphraseBtn" style="background: var(--tertiary); color: black; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer;">
+        <!-- Passphrase button -->
+        <div style="margin-top: 1rem; text-align: center;">
+            <button id="passphraseBtn" style="background: var(--tertiary); color: black; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; transition: all 0.3s;">
                 Generate Passphrase
             </button>
         </div>
 
-        <div class="history">
-            <h3>Recent Passwords:</h3>
-            <ul id="historyList"></ul>
+        <!-- Password options -->
+        <div class="options-section">
+            <label class="slider-container">
+                Password Length: 
+                <span id="lengthValue">12</span>
+                <input type="range" id="lengthSlider" min="4" max="64" value="12">
+            </label>
+
+            <div class="slider-container">
+                <label class="option-row">
+                    <input type="checkbox" id="uppercaseCheck" checked>
+                    <span style="margin-left: 0.5rem;">Include Uppercase Letters (A-Z)</span>
+                </label>
+                
+                <label class="option-row">
+                    <input type="checkbox" id="lowercaseCheck" checked>
+                    <span style="margin-left: 0.5rem;">Include Lowercase Letters (a-z)</span>
+                </label>
+                
+                <label class="option-row">
+                    <input type="checkbox" id="numbersCheck" checked>
+                    <span style="margin-left: 0.5rem;">Include Numbers (0-9)</span>
+                </label>
+                
+                <label class="option-row">
+                    <input type="checkbox" id="symbolsCheck" checked>
+                    <span style="margin-left: 0.5rem;">Include Symbols (!@#$%^&*)</span>
+                </label>
+                
+                <label class="option-row">
+                    <input type="checkbox" id="excludeAmbiguousCheck" checked>
+                    <span style="margin-left: 0.5rem;">Exclude Ambiguous Characters (lI1O0)</span>
+                </label>
+            </div>
         </div>
 
-        <div class="feedback" id="feedback">
-            <h3>Improvement Suggestions:</h3>
-            <ul id="feedbackList"></ul>
+        <!-- Password requirements -->
+        <div class="requirements-check">
+            <h3>Password Requirements:</h3>
+            <ul>
+                <li class="requirement" id="req-length">
+                    <span class="requirement-icon fas fa-times unmet"></span>Minimum 8 characters
+                </li>
+                <li class="requirement" id="req-uppercase">
+                    <span class="requirement-icon fas fa-times unmet"></span>At least one uppercase letter
+                </li>
+                <li class="requirement" id="req-lowercase">
+                    <span class="requirement-icon fas fa-times unmet"></span>At least one lowercase letter
+                </li>
+                <li class="requirement" id="req-number">
+                    <span class="requirement-icon fas fa-times unmet"></span>At least one number
+                </li>
+                <li class="requirement" id="req-symbol">
+                    <span class="requirement-icon fas fa-times unmet"></span>At least one special character
+                </li>
+                <li class="requirement" id="req-ambiguous">
+                    <span class="requirement-icon fas fa-times unmet"></span>No ambiguous characters (lI1O0)
+                </li>
+            </ul>
         </div>
 
+        <!-- Recent passwords -->
+        <div class="history-section">
+            <h3 style="margin-bottom: 0.5rem;">Recent Passwords:</h3>
+            <div id="historyList" style="font-size: 0.9rem;"></div>
+        </div>
+
+        <!-- Feedback and crack time -->
+        <ul class="feedback" id="feedbackList"></ul>
+        <div class="crack-time" id="crackTime">Estimated crack time: N/A</div>
+
+        <!-- Feature cards -->
         <div class="feature-cards">
+            <div class="feature-card">
+                <h3>Security Personas</h3>
+                <p>Get personalized guidance based on strength</p>
+            </div>
             <div class="feature-card">
                 <h3>Memory Triggers</h3>
                 <p>Create visual anchors for better retention</p>
             </div>
             <div class="feature-card">
-                <h3>Security Personas</h3>
-                <p>Get personalized guidance</p>
-            </div>
-            <div class="feature-card">
                 <h3>Compliance Helper</h3>
-                <p>Meet regulatory standards</p>
+                <p>Meet regulatory standards (GDPR, HIPAA, PCI DSS)</p>
             </div>
             <div class="feature-card">
                 <h3>Password Aging</h3>
@@ -556,31 +564,23 @@
             </div>
         </div>
 
-        <div class="footer" id="lastGenerated"></div>
+        <!-- Last generated info -->
+        <div class="footer" id="lastGenerated" style="margin-top: 2rem; text-align: center; font-size: 0.8rem;"></div>
     </div>
+
+    <!-- External libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/zxcvbn @4.4.2/dist/zxcvbn.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js " crossorigin="anonymous"></script>
 
     <script>
         // DOM Elements
         const passwordInput = document.getElementById('passwordInput');
         const copyBtn = document.getElementById('copyBtn');
         const generateBtn = document.getElementById('generateBtn');
-        const requirements = {
-            length: document.getElementById('req-length'),
-            uppercase: document.getElementById('req-uppercase'),
-            lowercase: document.getElementById('req-lowercase'),
-            number: document.getElementById('req-number'),
-            symbol: document.getElementById('req-symbol'),
-            ambiguous: document.getElementById('req-ambiguous')
-        };
-        const strengthMeter = document.getElementById('strengthMeter');
-        const strengthText = document.getElementById('strengthText');
-        const strengthScore = document.getElementById('strengthScore');
-        const feedbackList = document.getElementById('feedbackList');
-        const historyList = document.getElementById('historyList');
+        const passphraseBtn = document.getElementById('passphraseBtn');
         const lengthSlider = document.getElementById('lengthSlider');
         const lengthValue = document.getElementById('lengthValue');
         const visualHash = document.getElementById('visualHash');
-        const securityPersona = document.getElementById('securityPersona');
         const hackerBackground = document.getElementById('hackerBackground');
         const modeToggle = document.getElementById('modeToggle');
         const lastGenerated = document.getElementById('lastGenerated');
@@ -604,312 +604,146 @@
             'Fort Knox Defender': '🛡️'
         };
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            lengthValue.textContent = currentLength;
-            updateVisualHash();
-            updateRequirements();
-            generatePassword();
-            
-            // Create hacker background
+        // Initialize app
+        function init() {
+            // Set up hacker background
             createHackerBackground();
-        });
+            
+            // Set up event listeners
+            lengthSlider.addEventListener('input', (e) => {
+                currentLength = parseInt(e.target.value);
+                lengthValue.textContent = currentLength;
+                
+                if (passwordInput.value && !passwordInput.value.includes('Select')) {
+                    generatePassword();
+                }
+            });
 
-        lengthSlider.addEventListener('input', (e) => {
-            currentLength = parseInt(e.target.value);
-            lengthValue.textContent = currentLength;
-            if (passwordInput.value && !passwordInput.value.includes('Select')) {
+            copyBtn.addEventListener('click', () => {
+                if (passwordInput.value && passwordInput.value !== 'Select at least one character type') {
+                    navigator.clipboard.writeText(passwordInput.value)
+                        .then(() => {
+                            copyBtn.textContent = '✅';
+                            setTimeout(() => copyBtn.textContent = '📋', 2000);
+                        });
+                }
+            });
+
+            generateBtn.addEventListener('click', () => {
                 generatePassword();
-            }
-        });
+                triggerConfetti();
+            });
 
-        generateBtn.addEventListener('click', () => {
-            generatePassword();
-            triggerConfetti();
-        });
+            passphraseBtn.addEventListener('click', () => {
+                generatePassphrase();
+                triggerConfetti();
+            });
 
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(passwordInput.value)
-                .then(() => {
-                    copyBtn.textContent = '✅';
-                    setTimeout(() => copyBtn.textContent = '📋', 2000);
-                });
-        });
-
-        document.getElementById('passphraseBtn').addEventListener('click', () => {
-            generatePassphrase();
-            triggerConfetti();
-        });
-
-        document.getElementById('uppercaseCheck').addEventListener('change', () => {
-            if (!document.getElementById('uppercaseCheck').checked &&
-                !document.getElementById('lowercaseCheck').checked &&
-                !document.getElementById('numbersCheck').checked &&
-                !document.getElementById('symbolsCheck').checked) {
-                alert('Please select at least one character type');
-            } else {
-                generatePassword();
-            }
-        });
-
-        document.querySelectorAll('.option input[type="checkbox"]').forEach(input => {
-            input.addEventListener('change', () => {
-                if (input.id === 'uppercaseCheck' ||
-                    input.id === 'lowercaseCheck' ||
-                    input.id === 'numbersCheck' ||
-                    input.id === 'symbolsCheck') {
+            document.querySelectorAll('.option-row input[type="checkbox"]').forEach(input => {
+                input.addEventListener('change', () => {
                     if (!document.getElementById('uppercaseCheck').checked &&
                         !document.getElementById('lowercaseCheck').checked &&
                         !document.getElementById('numbersCheck').checked &&
                         !document.getElementById('symbolsCheck').checked) {
-                        passwordInput.value = 'Select at least one character type';
-                        return;
+                        alert('Please select at least one character type');
+                    } else {
+                        generatePassword();
                     }
-                }
-                generatePassword();
+                });
             });
-        });
 
-        modeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            document.body.classList.toggle('dark-mode');
-            modeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '🌞';
-            updateVisualHash();
-        });
+            modeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                document.body.classList.toggle('dark-mode');
+                modeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '🌞';
+            });
 
+            // Initial generation
+            generatePassword();
+        }
+
+        // Create animated hacker background
         function createHackerBackground() {
-            const lineCount = 20;
+            const lines = 20;
             const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-            for (let i = 0; i < lineCount; i++) {
+            
+            for (let i = 0; i < lines; i++) {
                 const line = document.createElement('div');
                 line.className = 'hacker-line';
-                line.style.top = `${i * 5}px`;
+                line.style.top = `${i * 20}px`;
                 line.style.left = `${Math.random() * 100}%`;
+                line.style.transform = 'translateX(-50%)';
                 line.textContent = Array.from({length: 80}, () => 
                     chars[Math.floor(Math.random() * chars.length)]
                 ).join('');
                 hackerBackground.appendChild(line);
             }
+            
+            // Update lines every 150ms
+            setInterval(() => {
+                const existingLines = document.querySelectorAll('.hacker-line');
+                existingLines.forEach((line, index) => {
+                    line.style.left = `${Math.random() * 100}%`;
+                    line.textContent = Array.from({length: 80}, () => 
+                        chars[Math.floor(Math.random() * chars.length)]
+                    ).join('');
+                });
+            }, 150);
         }
 
+        // Get character pool based on user selections
         function getCharacterPool() {
             let pool = '';
             if (document.getElementById('uppercaseCheck').checked) pool += uppercaseChars;
             if (document.getElementById('lowercaseCheck').checked) pool += lowercaseChars;
             if (document.getElementById('numbersCheck').checked) pool += numberChars;
             if (document.getElementById('symbolsCheck').checked) pool += symbolChars;
-
+            
             if (document.getElementById('excludeAmbiguousCheck').checked) {
                 pool = [...new Set(pool.split('').filter(c => !ambiguousChars.includes(c)).join(''));
             }
-
+            
             return pool;
         }
 
-        function getRandomChar(chars) {
-            return chars[Math.floor(Math.random() * chars.length)];
-        }
-
-        function shuffleString(string) {
-            const array = string.split('');
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array.join('');
-        }
-
-        function addHistory(pwd) {
-            if (pwd && !pwd.startsWith('Select')) {
-                passwordHistory.unshift(pwd);
-                passwordHistory = [...new Set(passwordHistory)].slice(0, 5);
-                
-                historyList.innerHTML = '';
-                passwordHistory.forEach((item, index) => {
-                    const li = document.createElement('li');
-                    li.textContent = item;
-                    li.style.cursor = 'pointer';
-                    li.addEventListener('click', () => {
-                        passwordInput.value = item;
-                        checkPasswordStrength(item);
-                    });
-                    historyList.appendChild(li);
-                });
-            }
-        }
-
-        function updateRequirements(pwd = passwordInput.value) {
-            const reqs = {
-                length: pwd.length >= 8,
-                uppercase: /[A-Z]/.test(pwd),
-                lowercase: /[a-z]/.test(pwd),
-                number: /\d/.test(pwd),
-                symbol: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
-                notAmbiguous: !/[lI1O0]/.test(pwd)
-            };
-
-            Object.entries(reqs).forEach(([key, met]) => {
-                requirements[key].classList.toggle('met', met);
-            });
-        }
-
-        function checkPasswordStrength(pwd) {
-            if (pwd.length === 0) {
-                resetUI();
-                return;
-            }
-
-            // Basic checks
-            const hasUppercase = /[A-Z]/.test(pwd);
-            const hasLowercase = /[a-z]/.test(pwd);
-            const hasNumber = /\d/.test(pwd);
-            const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
-
-            // Calculate score based on character variety and length
-            let score = 0;
-            if (hasUppercase) score++;
-            if (hasLowercase) score++;
-            if (hasNumber) score++;
-            if (hasSymbol) score++;
-
-            score += Math.floor(pwd.length / 4);
-
-            // Update requirement checks
-            updateRequirements(pwd);
-
-            // Generate feedback
-            const feedback = [];
-            if (!hasUppercase) feedback.push("Add uppercase letters");
-            if (!hasLowercase) feedback.push("Add lowercase letters");
-            if (!hasNumber) feedback.push("Add numbers");
-            if (!hasSymbol) feedback.push("Add special characters");
-            if (pwd.length < 12) feedback.push("Use at least 12 characters");
-
-            // Calculate crack time estimate
-            const times = [
-                "< 1 second",
-                "Seconds to minutes",
-                "Minutes to hours",
-                "Hours to days",
-                "Days to weeks",
-                "Weeks to months",
-                "Months to years",
-                "Years to decades",
-                "Decades to centuries",
-                "Centuries"
-            ];
-
-            const baseIndex = Math.min(9, score + Math.floor((pwd.length - 8) / 2));
-            const crackTime = times[baseIndex];
-
-            // Update UI
-            updateUI(pwd, score, crackTime, feedback);
-        }
-
-        function updateUI(password, score, crackTime, feedback) {
-            // Update strength meter
-            const percentage = ((score + 1) / 10) * 100;
-            strengthMeter.style.width = `${percentage}%`;
-
-            // Set color based on strength
-            if (score <= 1) {
-                strengthMeter.style.backgroundColor = 'var(--very-weak)';
-                strengthText.textContent = 'Very Weak 🔴';
-            } else if (score === 2) {
-                strengthMeter.style.backgroundColor = 'var(--weak)';
-                strengthText.textContent = 'Weak ⚠️';
-            } else if (score === 3) {
-                strengthMeter.style.backgroundColor = 'var(--moderate)';
-                strengthText.textContent = 'Moderate 🟡';
-            } else if (score <= 5) {
-                strengthMeter.style.backgroundColor = 'var(--strong)';
-                strengthText.textContent = 'Strong ✅';
-            } else {
-                strengthMeter.style.backgroundColor = 'var(--very-strong)';
-                strengthText.textContent = 'Very Strong 💪';
-            }
-
-            strengthScore.textContent = `${percentage.toFixed(0)}%`;
-            document.getElementById('crackTime').textContent = `Estimated time to crack: ${crackTime}`;
-
-            // Update feedback
-            const feedbackList = document.getElementById('feedbackList');
-            feedbackList.innerHTML = '';
-            
-            if (feedback.length > 0) {
-                feedback.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span>⚠️</span> ${item}`;
-                    feedbackList.appendChild(li);
-                });
-            } else {
-                const li = document.createElement('li');
-                li.innerHTML = '<span>✅</span> Great job! Your password is strong.';
-                feedbackList.appendChild(li);
-            }
-
-            // Update security persona
-            if (score <= 2) {
-                securityPersona.innerHTML = `<span>🏠 Glass House Dweller</span>`;
-            } else if (score <= 4) {
-                securityPersona.innerHTML = `<span>🔒 Vault Guardian</span>`;
-            } else {
-                securityPersona.innerHTML = `<span>🛡️ Fort Knox Defender</span>`;
-            }
-
-            // Update timestamp
-            const now = new Date();
-            lastGenerated.textContent = `Last generated: ${now.toLocaleTimeString()} • Age: ${getPasswordAge()}`;
-        }
-
-        function resetUI() {
-            strengthMeter.style.width = '0%';
-            strengthMeter.style.backgroundColor = 'var(--primary)';
-            strengthText.textContent = 'Very Weak 🔴';
-            strengthScore.textContent = '0%';
-            feedbackList.innerHTML = '';
-            document.getElementById('crackTime').textContent = 'Estimated time to crack: N/A';
-            Object.values(requirements).forEach(req => req.classList.remove('met'));
-            securityPersona.innerHTML = '<span>🏠 Glass House Dweller</span>';
-        }
-
+        // Generate random password
         function generatePassword() {
             const pool = getCharacterPool();
             if (pool.length === 0) {
                 passwordInput.value = 'Select at least one character type';
                 return;
             }
-
+            
             let newPassword = '';
-
+            
             // Ensure at least one of each selected category
             if (document.getElementById('uppercaseCheck').checked) newPassword += getRandomChar(uppercaseChars);
             if (document.getElementById('lowercaseCheck').checked) newPassword += getRandomChar(lowercaseChars);
             if (document.getElementById('numbersCheck').checked) newPassword += getRandomChar(numberChars);
             if (document.getElementById('symbolsCheck').checked) newPassword += getRandomChar(symbolChars);
-
+            
             // Fill the rest of the password
             while (newPassword.length < currentLength) {
                 newPassword += getRandomChar(pool);
             }
-
-            // Shuffle to avoid predictable patterns
+            
+            // Shuffle for better randomness
             newPassword = shuffleString(newPassword);
             
             passwordInput.value = newPassword;
             addHistory(newPassword);
             checkPasswordStrength(newPassword);
-            passwordInput.classList.add('pulse');
-            setTimeout(() => passwordInput.classList.remove('pulse'), 1000);
+            updateVisualHash(newPassword);
         }
 
+        // Generate XKCD-style passphrase
         function generatePassphrase() {
-            const wordList = ["correct", "horse", "battery", "staple", "dragon", "cloud", "sunny", "moonlight", "robot", "nebula", "galaxy", "shield"];
+            const wordList = ["correct", "horse", "battery", "staple", "dragon", "cloud",
+                             "sunny", "moonlight", "robot", "nebula", "galaxy", "shield"];
             const separator = "-";
             const capitalize = true;
             const wordCount = 4;
-
+            
             const parts = [];
             for (let i = 0; i < wordCount; i++) {
                 let word = wordList[Math.floor(Math.random() * wordList.length)];
@@ -918,15 +752,221 @@
                 }
                 parts.push(word);
             }
-
-            let phrase = parts.join(separator);
+            
+            const phrase = parts.join(separator);
             passwordInput.value = phrase;
             addHistory(phrase);
             checkPasswordStrength(phrase);
-            passwordInput.classList.add('pulse');
-            setTimeout(() => passwordInput.classList.remove('pulse'), 1000);
+            updateVisualHash(phrase);
         }
 
+        // Add password to history
+        function addHistory(pwd) {
+            if (pwd && !pwd.startsWith('Select')) {
+                passwordHistory.unshift(pwd);
+                passwordHistory = [...new Set(passwordHistory)].slice(0, 5);
+                
+                const historyList = document.getElementById('historyList');
+                if (historyList) {
+                    historyList.innerHTML = '';
+                    passwordHistory.forEach((item, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+                        div.textContent = item;
+                        div.addEventListener('click', () => {
+                            passwordInput.value = item;
+                            checkPasswordStrength(item);
+                            updateVisualHash(item);
+                        });
+                        historyList.appendChild(div);
+                    });
+                }
+            }
+        }
+
+        // Check password strength using zxcvbn algorithm
+        function checkPasswordStrength(pwd) {
+            if (pwd.length === 0) {
+                resetUI();
+                return;
+            }
+            
+            const result = zxcvbn(pwd);
+            const score = result.score;
+            const feedback = result.feedback.suggestions;
+            const crackTime = result.crack_times_display.offline_fast_hashing_1e10_per_second;
+            
+            // Update UI
+            updateRequirements(pwd);
+            updateStrengthMeter(score);
+            updateFeedback(feedback);
+            updateCrackTime(crackTime);
+            updatePersona(score);
+            updateTimeInfo();
+        }
+
+        // Update strength meter with animation
+        function updateStrengthMeter(score) {
+            const strengthLabel = document.querySelector('.strength-label');
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            
+            // Calculate percentage
+            const strengthPercentage = ((score + 1) / 5) * 100;
+            
+            // Update label
+            const strengthText = document.querySelector('.strength-label .strength-text');
+            if (strengthText) {
+                strengthText.remove();
+            }
+            
+            const strengthMessage = document.createElement('span');
+            strengthMessage.className = 'strength-text';
+            
+            if (score <= 1) {
+                strengthMeter.style.backgroundColor = 'var(--very-weak)';
+                strengthMessage.textContent = 'Very Weak 🔴';
+            } else if (score === 2) {
+                strengthMeter.style.backgroundColor = 'var(--weak)';
+                strengthMessage.textContent = 'Weak ⚠️';
+            } else if (score === 3) {
+                strengthMeter.style.backgroundColor = 'var(--moderate)';
+                strengthMessage.textContent = 'Moderate 🟡';
+            } else if (score === 4) {
+                strengthMeter.style.backgroundColor = 'var(--very-strong)';
+                strengthMessage.textContent = 'Very Strong 💪';
+            } else {
+                strengthMeter.style.backgroundColor = 'var(--primary)';
+                strengthMessage.textContent = 'Strong ✅';
+            }
+            
+            // Animate strength meter
+            strengthMeter.style.width = `${strengthPercentage}%`;
+            
+            // Add strength message
+            const strengthLabelContainer = document.querySelector('.strength-label');
+            if (strengthLabelContainer) {
+                strengthLabelContainer.innerHTML = `
+                    ${strengthMessage.outerHTML}
+                    <span>${strengthPercentage.toFixed(0)}%</span>
+                `;
+            }
+        }
+
+        // Update requirement checks
+        function updateRequirements(pwd) {
+            const reqs = {
+                length: pwd.length >= 8,
+                uppercase: /[A-Z]/.test(pwd),
+                lowercase: /[a-z]/.test(pwd),
+                number: /\d/.test(pwd),
+                symbol: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+                notAmbiguous: !/[lI1O0]/.test(pwd)
+            };
+            
+            // Update requirement icons
+            const reqElements = [
+                { id: 'req-length', met: reqs.length },
+                { id: 'req-uppercase', met: reqs.uppercase },
+                { id: 'req-lowercase', met: reqs.lowercase },
+                { id: 'req-number', met: reqs.number },
+                { id: 'req-symbol', met: reqs.symbol },
+                { id: 'req-ambiguous', met: reqs.notAmbiguous }
+            ];
+            
+            reqElements.forEach(req => {
+                const el = document.getElementById(req.id);
+                if (el) {
+                    el.innerHTML = req.met ? '✅' : '❌';
+                    el.classList.remove('unmet');
+                    el.classList.add(req.met ? 'fas fa-check met' : 'fas fa-times unmet');
+                }
+            });
+        }
+
+        // Update feedback messages
+        function updateFeedback(feedback) {
+            const feedbackList = document.getElementById('feedbackList');
+            if (!feedbackList) return;
+            
+            feedbackList.innerHTML = '';
+            if (feedback.length > 0) {
+                feedback.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="feedback-icon fas fa-exclamation-circle"></span>${item}`;
+                    feedbackList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.innerHTML = '<span class="feedback-icon fas fa-check-circle"></span>Great job! Your password is strong.';
+                feedbackList.appendChild(li);
+            }
+        }
+
+        // Update crack time display
+        function updateCrackTime(time) {
+            const crackTimeDiv = document.getElementById('crackTime');
+            if (crackTimeDiv) {
+                crackTimeDiv.textContent = `Estimated crack time: ${time}`;
+            }
+        }
+
+        // Reset UI elements
+        function resetUI() {
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            if (strengthMeter) {
+                strengthMeter.style.width = '0%';
+                strengthMeter.style.backgroundColor = 'var(--primary)';
+            }
+            
+            const feedbackList = document.getElementById('feedbackList');
+            if (feedbackList) feedbackList.innerHTML = '';
+            
+            const crackTimeDiv = document.getElementById('crackTime');
+            if (crackTimeDiv) crackTimeDiv.textContent = 'Estimated crack time: N/A';
+            
+            // Reset requirement icons
+            const requirements = [
+                'req-length', 'req-uppercase', 'req-lowercase',
+                'req-number', 'req-symbol', 'req-ambiguous'
+            ];
+            
+            requirements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = '❌';
+                    el.className = 'requirement-icon fas fa-times unmet';
+                }
+            });
+        }
+
+        // Update security persona
+        function updatePersona(score) {
+            const personaDiv = document.getElementById('securityPersona');
+            if (!personaDiv) return;
+            
+            let persona;
+            if (score <= 1) {
+                persona = 'Glass House Dweller';
+            } else if (score === 2) {
+                persona = 'Vault Guardian';
+            } else {
+                persona = 'Fort Knox Defender';
+            }
+            
+            personaDiv.innerHTML = `<span>${personas[persona]}</span> ${persona}`;
+        }
+
+        // Update time info
+        function updateTimeInfo() {
+            const now = new Date();
+            const age = getPasswordAge();
+            const lastGeneratedDiv = document.getElementById('lastGenerated');
+            if (lastGeneratedDiv) {
+                lastGeneratedDiv.textContent = `Last generated: ${now.toLocaleTimeString()} • Age: ${age}`;
+            }
+        }
+
+        // Get password age
         function getPasswordAge() {
             const ageInMinutes = Math.floor(Math.random() * 100);
             if (ageInMinutes < 15) return 'Fresh';
@@ -935,68 +975,79 @@
             return 'Needs Update';
         }
 
+        // Trigger confetti animation
         function triggerConfetti() {
-            const colors = ['#FFD700', '#00BFFF', '#FF69B4', '#00FF00', '#FFA500'];
-            const duration = 3000;
-            const end = Date.now() + duration;
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            if (!strengthMeter || !strengthMeter.style.width) return;
             
-            (function frame() {
-                const now = Date.now();
-                if (now < end) {
-                    requestAnimationFrame(frame);
-                }
+            const strengthWidth = parseFloat(strengthMeter.style.width);
+            if (strengthWidth > 70) {
+                const colors = ['#FFD700', '#00BFFF', '#FF69B4', '#00FF00', '#FFA500'];
+                const duration = 3000;
+                const end = Date.now() + duration;
                 
-                const count = 5;
-                for (let i = 0; i < count; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = `${Math.random() * 100}%`;
-                    confetti.style.top = `${Math.random() * 100}%`;
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                    document.body.appendChild(confetti);
+                (function frame() {
+                    const now = Date.now();
+                    if (now < end) {
+                        requestAnimationFrame(frame);
+                    }
                     
-                    const size = Math.random() * 6 + 4;
-                    confetti.style.width = `${size}px`;
-                    confetti.style.height = `${size}px`;
-                    
-                    const animation = confetti.animate(
-                        {
-                            transform: ['translateY(0) rotate(0)', 
-                                        'translateY(100vh) rotate(360deg)'],
-                            opacity: [1, 0]
-                        },
-                        {
-                            duration: 3000,
-                            easing: 'linear'
-                        }
-                    );
-                    
-                    animation.onfinish = () => confetti.remove();
-                }
-            })();
+                    const count = 5;
+                    for (let i = 0; i < count; i++) {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.left = `${Math.random() * 100}%`;
+                        confetti.style.top = `${Math.random() * 100}%`;
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                        document.body.appendChild(confetti);
+                        
+                        const size = Math.random() * 6 + 4;
+                        confetti.style.width = `${size}px`;
+                        confetti.style.height = `${size}px`;
+                        
+                        const animation = confetti.animate(
+                            {
+                                transform: ['translateY(0) rotate(0)', 'translateY(100vh) rotate(360deg)'],
+                                opacity: [1, 0]
+                            },
+                            {
+                                duration: 3000,
+                                easing: 'linear'
+                            }
+                        );
+                        
+                        animation.onfinish = () => confetti.remove();
+                    }
+                })();
+            }
         }
 
+        // Update visual hash representation
         function updateVisualHash(pwd = passwordInput.value) {
             const canvas = document.getElementById('visualHash');
+            if (!canvas) return;
+            
             const ctx = canvas.getContext('2d');
             const size = 100;
             canvas.width = size;
             canvas.height = size;
-
-            // Create hash from password
-            const hash = pwd.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
             
-            // Create unique pattern based on password
+            // Generate a pattern based on password
+            const hash = pwd.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
             const hue = hash % 360;
             const saturation = 70 + (hash % 20);
             const lightness = 50 + (hash % 10);
             
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Draw background
             ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
             ctx.fillRect(0, 0, size, size);
             
-            // Add some texture
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            // Add texture
+            ctx.fillStyle = 'rgba(255, 250, 250, 0.1)';
             for (let i = 0; i < 10; i++) {
                 ctx.beginPath();
                 ctx.arc(
@@ -1010,19 +1061,96 @@
             }
         }
 
-        function updateVisualHashOnInput() {
-            updateVisualHash();
-            checkPasswordStrength(passwordInput.value);
+        // Real-time password strength check
+        passwordInput.addEventListener('input', function() {
+            const pwd = this.value;
+            if (pwd) {
+                checkPasswordStrength(pwd);
+                updateVisualHash(pwd);
+                passwordInput.classList.add('pulse');
+                setTimeout(() => passwordInput.classList.remove('pulse'), 1000);
+            }
+        });
+
+        // Get random character from string
+        function getRandomChar(chars) {
+            return chars[Math.floor(Math.random() * chars.length)];
         }
 
-        passwordInput.addEventListener('input', updateVisualHashOnInput);
+        // Shuffle string
+        function shuffleString(string) {
+            const array = string.split('');
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array.join('');
+        }
 
+        // Create password with good distribution
+        function createPassword(length) {
+            let password = '';
+            
+            if (document.getElementById('uppercaseCheck').checked) password += getRandomChar(uppercaseChars);
+            if (document.getElementById('lowercaseCheck').checked) password += getRandomChar(lowercaseChars);
+            if (document.getElementById('numbersCheck').checked) password += getRandomChar(numberChars);
+            if (document.getElementById('symbolsCheck').checked) password += getRandomChar(symbolChars);
+            
+            return password;
+        }
+
+        // Generate strong password
+        function generatePassword() {
+            const pool = getCharacterPool();
+            if (pool.length === 0) {
+                passwordInput.value = 'Select at least one character type';
+                return;
+            }
+            
+            let newPassword = createPassword(currentLength);
+            
+            // Fill remaining
+            while (newPassword.length < currentLength) {
+                newPassword += getRandomChar(pool);
+            }
+            
+            // Shuffle and set password
+            newPassword = shuffleString(newPassword);
+            passwordInput.value = newPassword;
+            
+            // Update UI
+            addHistory(newPassword);
+            checkPasswordStrength(newPassword);
+            updateVisualHash(newPassword);
+            passwordInput.classList.add('animate-pulse');
+            setTimeout(() => passwordInput.classList.remove('animate-pulse'), 1000);
+        }
+
+        // Update strength meter fill
+        function updateStrengthMeter(score) {
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            if (!strengthMeter) return;
+            
+            const strengthPercentage = ((score + 1) / 5) * 100;
+            strengthMeter.style.width = `${strengthPercentage}%`;
+        }
+
+        // Call init when page loads
+        window.addEventListener('load', () => {
+            // Wait for DOM to be ready
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                document.addEventListener("DOMContentLoaded", init);
+            }
+        });
+
+        // Confetti particle creation
         function createConfettiParticle(x, y) {
             const particle = document.createElement('div');
             particle.className = 'confetti';
             particle.style.left = `${x}%`;
             particle.style.top = `${y}%`;
-            particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
             document.body.appendChild(particle);
             
             const size = Math.random() * 6 + 4;
@@ -1031,8 +1159,7 @@
             
             const animation = particle.animate(
                 {
-                    transform: ['translateY(0) rotate(0)', 
-                                'translateY(100vh) rotate(360deg)'],
+                    transform: ['translateY(0) rotate(0)', 'translateY(100vh) rotate(360deg)'],
                     opacity: [1, 0]
                 },
                 {
@@ -1044,104 +1171,134 @@
             animation.onfinish = () => particle.remove();
         }
 
+        // Confetti animation trigger
         function triggerConfetti() {
-            if (strengthMeter.offsetWidth / strengthMeter.parentElement.offsetWidth > 0.7) {
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            if (!strengthMeter) return;
+            
+            const strengthWidth = parseFloat(strengthMeter.style.width);
+            if (strengthWidth > 70) {
                 for (let i = 0; i < 50; i++) {
                     createConfettiParticle(Math.random() * 100, Math.random() * 100);
                 }
             }
         }
 
-        function updateVisualHashOnInput() {
-            updateVisualHash();
-            checkPasswordStrength(passwordInput.value);
-        }
-
-        function getPasswordEntropy(pwd) {
-            const charsetSize = (
-                (/[A-Z]/.test(pwd) ? 26 : 0) +
-                (/[a-z]/.test(pwd) ? 26 : 0) +
-                (/\d/.test(pwd) ? 10 : 0) +
-                (/[!@#$%^&*]/.test(pwd) ? 32 : 0)
-            );
+        // Update requirement checks
+        function updateRequirements(pwd) {
+            const reqs = {
+                length: pwd.length >= 8,
+                uppercase: /[A-Z]/.test(pwd),
+                lowercase: /[a-z]/.test(pwd),
+                number: /\d/.test(pwd),
+                symbol: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+                notAmbiguous: !/[lI1O0]/.test(pwd)
+            };
             
-            return charsetSize > 0 ? (Math.log2(charsetSize) * pwd.length).toFixed(2) : 0;
-        }
-
-        function simulateBreachCheck(pwd) {
-            const commonPasswords = ['password', '123456', 'qwerty', 'abc123'];
-            return commonPasswords.some(p => pwd.toLowerCase().includes(p)) ?
-                '⚠️ Warning: This password contains common patterns found in breaches!' :
-                '';
-        }
-
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min)) + min;
-        }
-
-        function updateUIForLightMode(isLight) {
-            document.body.classList.toggle('light-mode', isLight);
-            document.body.classList.toggle('dark-mode', !isLight);
-            modeToggle.textContent = isLight ? '🌙' : '🌞';
-        }
-
-        function updateVisualHash(pwd = passwordInput.value) {
-            const canvas = document.getElementById('visualHash');
-            const ctx = canvas.getContext('2d');
-            const size = 100;
-            canvas.width = size;
-            canvas.height = size;
-
-            // Create a simple visual hash based on password
-            const hash = pwd.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            // Update requirement icons
+            const reqElements = [
+                { id: 'req-length', met: reqs.length },
+                { id: 'req-uppercase', met: reqs.uppercase },
+                { id: 'req-lowercase', met: reqs.lowercase },
+                { id: 'req-number', met: reqs.number },
+                { id: 'req-symbol', met: reqs.symbol },
+                { id: 'req-ambiguous', met: reqs.notAmbiguous }
+            ];
             
-            // Create a unique pattern based on the hash
-            const hue = hash % 360;
-            const saturation = 70 + (hash % 20);
-            const lightness = 50 + (hash % 10);
+            reqElements.forEach(req => {
+                const el = document.getElementById(req.id);
+                if (el) {
+                    el.innerHTML = req.met ? '✅' : '❌';
+                    el.className = req.met ? 'requirement-icon fas fa-check met' : 'requirement-icon fas fa-times unmet';
+                }
+            });
+        }
+
+        // Update strength meter and feedback
+        function updateStrengthMeterAndFeedback(pwd) {
+            const result = zxcvbn(pwd);
+            const score = result.score;
             
-            ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-            ctx.fillRect(0, 0, size, size);
+            // Update strength meter
+            updateStrengthMeter(score);
             
-            // Add some texture
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            for (let i = 0; i < 10; i++) {
-                ctx.beginPath();
-                ctx.arc(
-                    Math.sin(i * 0.5) * size * 0.3 + size * 0.5,
-                    Math.cos(i * 0.7) * size * 0.3 + size * 0.5,
-                    5 + Math.random() * 10,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
+            // Update feedback
+            const feedbackList = document.getElementById('feedbackList');
+            if (result.feedback.suggestions.length > 0) {
+                feedbackList.innerHTML = '';
+                result.feedback.suggestions.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="feedback-icon fas fa-exclamation-circle"></span>${item}`;
+                    feedbackList.appendChild(li);
+                });
+            } else {
+                feedbackList.innerHTML = '<li><span class="feedback-icon fas fa-check-circle"></span>Great job! Your password is strong.</li>';
+            }
+            
+            // Update crack time
+            const crackTimeDiv = document.getElementById('crackTime');
+            if (crackTimeDiv) {
+                crackTimeDiv.textContent = `Estimated crack time: ${result.crack_times_display.online_no_guesses_per_second}`;
+            }
+            
+            // Update security persona
+            const personaDiv = document.getElementById('securityPersona');
+            if (personaDiv) {
+                let persona;
+                if (score <= 1) {
+                    personaDiv.innerHTML = `<span>🏠 Glass House Dweller</span>`;
+                } else if (score <= 3) {
+                    personaDiv.innerHTML = `<span>🔒 Vault Guardian</span>`;
+                } else {
+                    personaDiv.innerHTML = `<span>🛡️ Fort Knox Defender</span>`;
+                }
             }
         }
 
-        // Initialize
-        function init() {
-            // Initial password generation
-            generatePassword();
-
-            // Setup event listeners
-            document.getElementById('uppercaseCheck').addEventListener('change', () => {
-                if (!document.getElementById('uppercaseCheck').checked &&
-                    !document.getElementById('lowercaseCheck').checked &&
-                    !document.getElementById('numbersCheck').checked &&
-                    !document.getElementById('symbolsCheck').checked) {
-                    passwordInput.value = 'Select at least one character type';
-                    return;
+        // Setup click handlers
+        function setupEventListeners() {
+            // Copy to clipboard
+            document.getElementById('copyBtn').addEventListener('click', () => {
+                if (passwordInput.value && !passwordInput.value.includes('Select')) {
+                    navigator.clipboard.writeText(passwordInput.value)
+                        .then(() => {
+                            copyBtn.textContent = '✅';
+                            setTimeout(() => copyBtn.textContent = '📋', 2000);
+                        });
                 }
-                generatePassword();
             });
 
-            document.getElementById('lowercaseCheck').addEventListener('change', generatePassword);
-            document.getElementById('numbersCheck').addEventListener('change', generatePassword);
-            document.getElementById('symbolsCheck').addEventListener('change', generatePassword);
-            document.getElementById('excludeAmbiguousCheck').addEventListener('change', generatePassword);
+            // Toggle password visibility
+            const toggleButton = document.createElement('i');
+            toggleButton.className = 'toggle-password fas fa-eye';
+            document.querySelector('.password-display').appendChild(toggleButton);
+
+            toggleButton.addEventListener('click', () => {
+                const input = document.getElementById('passwordInput');
+                const type = input.type === 'password' ? 'text' : 'password';
+                input.type = type;
+                toggleButton.classList.toggle('fa-eye');
+                toggleButton.classList.toggle('fa-eye-slash');
+            });
+
+            // Apply pulsing effect to generate button
+            document.getElementById('generateBtn').addEventListener('click', () => {
+                document.getElementById('generateBtn').classList.add('pulse');
+                setTimeout(() => document.getElementById('generateBtn').classList.remove('pulse'), 1000);
+            });
         }
 
-        init();
+        // Main initialization function
+        function init() {
+            // Create hacker background
+            createHackerBackground();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Generate initial password
+            generatePassword();
+        }
     </script>
 </body>
-    </html>
+</html>
