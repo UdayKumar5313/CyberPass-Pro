@@ -257,11 +257,31 @@ function generateQRCode() {
 }
 
 function openPasswordVault() {
-    showPopup('Password Vault: ' + passwordHistory.map(item => item.password).join(', '));
+    if (passwordHistory.length > 0) {
+        const passwords = passwordHistory.map(item => `${item.timestamp}: ${item.password}`).join('\n');
+        showPopup(`Password Vault:\n${passwords}`);
+    } else {
+        showPopup('Password Vault is empty!');
+    }
 }
 
 function simulateBreachScan() {
-    showPopup('Simulating Breach Scan...');
+    const password = document.getElementById('password').value;
+    if (password) {
+        const entropy = calculateEntropy(password);
+        const strength = (entropy / Math.log2(Math.pow(94, password.length))) * 100;
+        let message = `Breach Scan Simulation:\nPassword: ${password}\nEntropy: ${entropy.toFixed(2)} bits\nStrength: ${strength.toFixed(2)}%`;
+        if (strength < 50) {
+            message += '\nWarning: Password is weak!';
+        } else if (strength < 80) {
+            message += '\nNote: Password is moderate.';
+        } else {
+            message += '\nNote: Password is strong!';
+        }
+        showPopup(message);
+    } else {
+        showPopup('No password to simulate breach scan!');
+    }
 }
 
 function showPopup(message) {
