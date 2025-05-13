@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Password Generator</title>
+    <title>Hacker Style Password Generator</title>
     <style>
         :root {
             --primary: #00ff00;
@@ -36,7 +36,7 @@
             padding: 2rem;
             position: relative;
             overflow: hidden;
-            transition: background 0.5s ease, color 0.5s ease;
+            transition: all 0.5s ease;
         }
 
         /* Hacker background animation */
@@ -109,7 +109,7 @@
             color: var(--primary);
             position: relative;
             margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .password-display:hover {
@@ -130,8 +130,8 @@
 
         .password-display .controls {
             position: absolute;
-            right: 10px;
-            top: 10px;
+            right: 1rem;
+            top: 1rem;
             display: flex;
             gap: 0.5rem;
         }
@@ -143,13 +143,12 @@
             padding: 0.4rem 0.6rem;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .password-display .controls button:hover {
             background: var(--primary);
             color: var(--dark);
-            border-color: var(--primary);
         }
 
         /* Generate button */
@@ -165,7 +164,7 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .generate-btn:hover {
@@ -187,7 +186,7 @@
         }
 
         .generate-btn.animate::before {
-            animation: ripple 0.6s ease-out;
+            animation: ripple 0.6s ease-out forwards;
         }
 
         @keyframes ripple {
@@ -214,39 +213,11 @@
         .strength-meter-fill {
             height: 100%;
             width: 0%;
+            background: var(--primary);
             transition: all 0.5s ease-out;
         }
 
-        .strength-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Options */
-        .options-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .option-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.8rem;
-        }
-
-        .slider-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .slider-container .length-value {
-            min-width: 30px;
-        }
-
-        /* Feedback */
+        /* Feedback section */
         .feedback {
             margin-top: 1rem;
             font-size: 0.9rem;
@@ -260,73 +231,44 @@
 
         .feedback li span.feedback-icon {
             margin-right: 0.5rem;
+            color: var(--moderate);
         }
 
-        /* Requirements check */
-        .requirements-check {
+        .requirements {
             margin-top: 1.5rem;
         }
 
-        .requirement {
+        .requirements li {
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
         }
 
-        .requirement span.requirement-icon {
+        .requirements li span.requirement-icon {
             margin-right: 0.5rem;
         }
 
-        .requirement.met span.requirement-icon {
-            color: var(--success);
+        .met span.requirement-icon {
+            color: var(--very-strong);
         }
 
-        .requirement.unmet span.requirement-icon {
-            color: var(--danger);
+        .unmet span.requirement-icon {
+            color: var(--very-weak);
         }
 
-        /* History section */
-        .history-section {
-            margin-top: 1.5rem;
+        .slider-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
 
-        .history-item {
-            cursor: pointer;
-            padding: 0.3rem 0;
-            transition: color 0.3s;
+        .option-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
         }
 
-        .history-item:hover {
-            color: var(--secondary);
-        }
-
-        /* Visual hash representation */
-        .visual-hash {
-            width: 100px;
-            height: 100px;
-            margin: 1rem auto;
-            display: block;
-            border: 1px solid var(--primary);
-            border-radius: 4px;
-        }
-
-        /* Security persona */
-        .security-persona {
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        /* Crack time display */
-        .crack-time {
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            text-align: center;
-            font-style: italic;
-        }
-
-        /* Dark mode toggle */
         .mode-toggle {
             position: absolute;
             top: 1rem;
@@ -334,14 +276,20 @@
             cursor: pointer;
         }
 
-        /* Light mode styles */
+        .dark-mode .mode-toggle {
+            color: var(--primary);
+        }
+
         .light-mode {
             background-color: var(--light);
             color: var(--dark);
         }
 
-        .light-mode .password-display {
+        .light-mode .password-display input {
             color: var(--dark);
+        }
+
+        .light-mode .password-display {
             border-color: var(--dark);
         }
 
@@ -360,11 +308,11 @@
             background-color: #ddd;
         }
 
-        .light-mode .requirement span.requirement-icon.fas.fa-check {
+        .light-mode .requirement-icon.fas.fa-check {
             color: var(--success);
         }
 
-        .light-mode .requirement span.requirement-icon.fas.fa-times {
+        .light-mode .requirement-icon.fas.fa-times {
             color: var(--danger);
         }
 
@@ -376,7 +324,44 @@
             color: var(--dark);
         }
 
-        /* Card layout for extra features */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes confetti-fall {
+            from {
+                transform: translateY(0) rotate(0);
+            }
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .visual-hash {
+            width: 100px;
+            height: 100px;
+            margin: 1rem auto;
+            display: block;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+        }
+
+        .security-persona {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
         .feature-cards {
             margin-top: 2rem;
             display: grid;
@@ -398,42 +383,39 @@
             box-shadow: 0 0 10px var(--secondary);
         }
 
-        .feature-card h3 {
-            margin-bottom: 0.5rem;
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            text-align: center;
         }
 
-        /* Confetti animation */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 2;
+        .history-section {
+            margin-top: 1.5rem;
         }
 
-        /* Responsive design */
+        .history-item {
+            cursor: pointer;
+            padding: 0.3rem 0;
+            transition: color 0.3s;
+        }
+
+        .history-item:hover {
+            color: var(--secondary);
+        }
+
+        .crack-time {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
         @media (max-width: 600px) {
-            .container {
-                padding: 1rem;
-            }
-
             h1 {
                 font-size: 1.5rem;
             }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        @keyframes confetti-fall {
-            from {
-                transform: translateY(0) rotate(0);
-            }
-            to {
-                transform: translateY(100vh) rotate(360deg);
+            
+            .container {
+                padding: 1rem;
             }
         }
     </style>
@@ -510,25 +492,25 @@
         </div>
 
         <!-- Password requirements -->
-        <div class="requirements-check">
+        <div class="requirements" id="requirements">
             <h3>Password Requirements:</h3>
             <ul>
-                <li class="requirement" id="req-length">
+                <li class="unmet" id="req-length">
                     <span class="requirement-icon fas fa-times unmet"></span>Minimum 8 characters
                 </li>
-                <li class="requirement" id="req-uppercase">
+                <li class="unmet" id="req-uppercase">
                     <span class="requirement-icon fas fa-times unmet"></span>At least one uppercase letter
                 </li>
-                <li class="requirement" id="req-lowercase">
+                <li class="unmet" id="req-lowercase">
                     <span class="requirement-icon fas fa-times unmet"></span>At least one lowercase letter
                 </li>
-                <li class="requirement" id="req-number">
+                <li class="unmet" id="req-number">
                     <span class="requirement-icon fas fa-times unmet"></span>At least one number
                 </li>
-                <li class="requirement" id="req-symbol">
+                <li class="unmet" id="req-symbol">
                     <span class="requirement-icon fas fa-times unmet"></span>At least one special character
                 </li>
-                <li class="requirement" id="req-ambiguous">
+                <li class="unmet" id="req-ambiguous">
                     <span class="requirement-icon fas fa-times unmet"></span>No ambiguous characters (lI1O0)
                 </li>
             </ul>
@@ -541,7 +523,7 @@
         </div>
 
         <!-- Feedback and crack time -->
-        <ul class="feedback" id="feedbackList"></ul>
+        <ul class="feedback" id="feedback"></ul>
         <div class="crack-time" id="crackTime">Estimated crack time: N/A</div>
 
         <!-- Feature cards -->
@@ -565,12 +547,8 @@
         </div>
 
         <!-- Last generated info -->
-        <div class="footer" id="lastGenerated" style="margin-top: 2rem; text-align: center; font-size: 0.8rem;"></div>
+        <div class="footer" id="lastGenerated">Last generated: N/A</div>
     </div>
-
-    <!-- External libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/zxcvbn @4.4.2/dist/zxcvbn.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js " crossorigin="anonymous"></script>
 
     <script>
         // DOM Elements
@@ -721,7 +699,7 @@
             if (document.getElementById('lowercaseCheck').checked) newPassword += getRandomChar(lowercaseChars);
             if (document.getElementById('numbersCheck').checked) newPassword += getRandomChar(numberChars);
             if (document.getElementById('symbolsCheck').checked) newPassword += getRandomChar(symbolChars);
-            
+
             // Fill the rest of the password
             while (newPassword.length < currentLength) {
                 newPassword += getRandomChar(pool);
@@ -791,13 +769,48 @@
                 return;
             }
             
-            const result = zxcvbn(pwd);
-            const score = result.score;
-            const feedback = result.feedback.suggestions;
-            const crackTime = result.crack_times_display.offline_fast_hashing_1e10_per_second;
+            // Basic checks
+            const hasUppercase = /[A-Z]/.test(pwd);
+            const hasLowercase = /[a-z]/.test(pwd);
+            const hasNumber = /\d/.test(pwd);
+            const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+            
+            // Calculate score based on character variety and length
+            let score = 0;
+            if (hasUppercase) score++;
+            if (hasLowercase) score++;
+            if (hasNumber) score++;
+            if (hasSymbol) score++;
+            
+            score += Math.floor(pwd.length / 4);
+            
+            // Generate feedback
+            const feedback = [];
+            if (!hasUppercase) feedback.push("Add uppercase letters");
+            if (!hasLowercase) feedback.push("Add lowercase letters");
+            if (!hasNumber) feedback.push("Add numbers");
+            if (!hasSymbol) feedback.push("Add special characters");
+            if (pwd.length < 12) feedback.push("Use at least 12 characters");
+            
+            // Calculate crack time estimate
+            const times = [
+                "< 1 second",
+                "Seconds to minutes",
+                "Minutes to hours",
+                "Hours to days",
+                "Days to weeks",
+                "Weeks to months",
+                "Months to years",
+                "Years to decades",
+                "Decades to centuries",
+                "Centuries"
+            ];
+            
+            const baseIndex = Math.min(9, score + Math.floor((pwd.length - 8) / 2));
+            const crackTime = times[baseIndex];
             
             // Update UI
-            updateRequirements(pwd);
+            updateRequirements(pwd, hasUppercase, hasLowercase, hasNumber, hasSymbol);
             updateStrengthMeter(score);
             updateFeedback(feedback);
             updateCrackTime(crackTime);
@@ -805,61 +818,14 @@
             updateTimeInfo();
         }
 
-        // Update strength meter with animation
-        function updateStrengthMeter(score) {
-            const strengthLabel = document.querySelector('.strength-label');
-            const strengthMeter = document.querySelector('.strength-meter-fill');
-            
-            // Calculate percentage
-            const strengthPercentage = ((score + 1) / 5) * 100;
-            
-            // Update label
-            const strengthText = document.querySelector('.strength-label .strength-text');
-            if (strengthText) {
-                strengthText.remove();
-            }
-            
-            const strengthMessage = document.createElement('span');
-            strengthMessage.className = 'strength-text';
-            
-            if (score <= 1) {
-                strengthMeter.style.backgroundColor = 'var(--very-weak)';
-                strengthMessage.textContent = 'Very Weak 🔴';
-            } else if (score === 2) {
-                strengthMeter.style.backgroundColor = 'var(--weak)';
-                strengthMessage.textContent = 'Weak ⚠️';
-            } else if (score === 3) {
-                strengthMeter.style.backgroundColor = 'var(--moderate)';
-                strengthMessage.textContent = 'Moderate 🟡';
-            } else if (score === 4) {
-                strengthMeter.style.backgroundColor = 'var(--very-strong)';
-                strengthMessage.textContent = 'Very Strong 💪';
-            } else {
-                strengthMeter.style.backgroundColor = 'var(--primary)';
-                strengthMessage.textContent = 'Strong ✅';
-            }
-            
-            // Animate strength meter
-            strengthMeter.style.width = `${strengthPercentage}%`;
-            
-            // Add strength message
-            const strengthLabelContainer = document.querySelector('.strength-label');
-            if (strengthLabelContainer) {
-                strengthLabelContainer.innerHTML = `
-                    ${strengthMessage.outerHTML}
-                    <span>${strengthPercentage.toFixed(0)}%</span>
-                `;
-            }
-        }
-
         // Update requirement checks
-        function updateRequirements(pwd) {
+        function updateRequirements(pwd, hasUppercase, hasLowercase, hasNumber, hasSymbol) {
             const reqs = {
                 length: pwd.length >= 8,
-                uppercase: /[A-Z]/.test(pwd),
-                lowercase: /[a-z]/.test(pwd),
-                number: /\d/.test(pwd),
-                symbol: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+                uppercase: hasUppercase,
+                lowercase: hasLowercase,
+                number: hasNumber,
+                symbol: hasSymbol,
                 notAmbiguous: !/[lI1O0]/.test(pwd)
             };
             
@@ -876,16 +842,42 @@
             reqElements.forEach(req => {
                 const el = document.getElementById(req.id);
                 if (el) {
-                    el.innerHTML = req.met ? '✅' : '❌';
-                    el.classList.remove('unmet');
-                    el.classList.add(req.met ? 'fas fa-check met' : 'fas fa-times unmet');
+                    const icon = el.querySelector('.requirement-icon');
+                    if (icon) {
+                        icon.className = `requirement-icon ${req.met ? 'fas fa-check met' : 'fas fa-times unmet'}`;
+                    }
                 }
             });
         }
 
+        // Update strength meter
+        function updateStrengthMeter(score) {
+            const strengthLabel = document.querySelector('.strength-label');
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            
+            // Calculate percentage
+            const strengthPercentage = ((score + 1) / 10) * 100;
+            
+            // Update strength meter
+            strengthMeter.style.width = `${strengthPercentage}%`;
+            
+            // Set color based on strength
+            if (score <= 1) {
+                strengthMeter.style.backgroundColor = 'var(--very-weak)';
+            } else if (score === 2) {
+                strengthMeter.style.backgroundColor = 'var(--weak)';
+            } else if (score === 3) {
+                strengthMeter.style.backgroundColor = 'var(--moderate)';
+            } else if (score <= 5) {
+                strengthMeter.style.backgroundColor = 'var(--very-strong)';
+            } else {
+                strengthMeter.style.backgroundColor = 'var(--primary)';
+            }
+        }
+
         // Update feedback messages
         function updateFeedback(feedback) {
-            const feedbackList = document.getElementById('feedbackList');
+            const feedbackList = document.getElementById('feedback');
             if (!feedbackList) return;
             
             feedbackList.innerHTML = '';
@@ -906,7 +898,7 @@
         function updateCrackTime(time) {
             const crackTimeDiv = document.getElementById('crackTime');
             if (crackTimeDiv) {
-                crackTimeDiv.textContent = `Estimated crack time: ${time}`;
+                crackTimeDiv.textContent = `Estimated time to crack: ${time}`;
             }
         }
 
@@ -918,23 +910,21 @@
                 strengthMeter.style.backgroundColor = 'var(--primary)';
             }
             
-            const feedbackList = document.getElementById('feedbackList');
+            const feedbackList = document.getElementById('feedback');
             if (feedbackList) feedbackList.innerHTML = '';
             
             const crackTimeDiv = document.getElementById('crackTime');
             if (crackTimeDiv) crackTimeDiv.textContent = 'Estimated crack time: N/A';
             
             // Reset requirement icons
-            const requirements = [
-                'req-length', 'req-uppercase', 'req-lowercase',
-                'req-number', 'req-symbol', 'req-ambiguous'
-            ];
-            
+            const requirements = ['req-length', 'req-uppercase', 'req-lowercase', 'req-number', 'req-symbol', 'req-ambiguous'];
             requirements.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.innerHTML = '❌';
-                    el.className = 'requirement-icon fas fa-times unmet';
+                    const icon = el.querySelector('.requirement-icon');
+                    if (icon) {
+                        icon.className = 'requirement-icon fas fa-times unmet';
+                    }
                 }
             });
         }
@@ -944,16 +934,13 @@
             const personaDiv = document.getElementById('securityPersona');
             if (!personaDiv) return;
             
-            let persona;
             if (score <= 1) {
-                persona = 'Glass House Dweller';
-            } else if (score === 2) {
-                persona = 'Vault Guardian';
+                personaDiv.innerHTML = `<span>🏠 Glass House Dweller</span>`;
+            } else if (score <= 3) {
+                personaDiv.innerHTML = `<span>🔒 Vault Guardian</span>`;
             } else {
-                persona = 'Fort Knox Defender';
+                personaDiv.innerHTML = `<span>🛡️ Fort Knox Defender</span>`;
             }
-            
-            personaDiv.innerHTML = `<span>${personas[persona]}</span> ${persona}`;
         }
 
         // Update time info
@@ -1026,15 +1013,15 @@
         // Update visual hash representation
         function updateVisualHash(pwd = passwordInput.value) {
             const canvas = document.getElementById('visualHash');
-            if (!canvas) return;
-            
             const ctx = canvas.getContext('2d');
             const size = 100;
             canvas.width = size;
             canvas.height = size;
             
-            // Generate a pattern based on password
+            // Create hash from password
             const hash = pwd.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            
+            // Create unique pattern based on password
             const hue = hash % 360;
             const saturation = 70 + (hash % 20);
             const lightness = 50 + (hash % 10);
@@ -1063,10 +1050,10 @@
 
         // Real-time password strength check
         passwordInput.addEventListener('input', function() {
-            const pwd = this.value;
-            if (pwd) {
-                checkPasswordStrength(pwd);
-                updateVisualHash(pwd);
+            const password = this.value;
+            if (password) {
+                checkPasswordStrength(password);
+                updateVisualHash(password);
                 passwordInput.classList.add('pulse');
                 setTimeout(() => passwordInput.classList.remove('pulse'), 1000);
             }
@@ -1088,7 +1075,7 @@
         }
 
         // Create password with good distribution
-        function createPassword(length) {
+        function createPassword() {
             let password = '';
             
             if (document.getElementById('uppercaseCheck').checked) password += getRandomChar(uppercaseChars);
@@ -1099,35 +1086,42 @@
             return password;
         }
 
-        // Generate strong password
-        function generatePassword() {
-            const pool = getCharacterPool();
-            if (pool.length === 0) {
-                passwordInput.value = 'Select at least one character type';
-                return;
-            }
+        // Update requirement checks
+        function updateRequirementChecks(pwd) {
+            const hasUppercase = /[A-Z]/.test(pwd);
+            const hasLowercase = /[a-z]/.test(pwd);
+            const hasNumber = /\d/.test(pwd);
+            const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+            const meetsLength = pwd.length >= 8;
+            const notAmbiguous = !/[lI1O0]/.test(pwd);
             
-            let newPassword = createPassword(currentLength);
+            // Update requirement icons
+            const reqElements = [
+                { id: 'req-length', met: meetsLength },
+                { id: 'req-uppercase', met: hasUppercase },
+                { id: 'req-lowercase', met: hasLowercase },
+                { id: 'req-number', met: hasNumber },
+                { id: 'req-symbol', met: hasSymbol },
+                { id: 'req-ambiguous', met: notAmbiguous }
+            ];
             
-            // Fill remaining
-            while (newPassword.length < currentLength) {
-                newPassword += getRandomChar(pool);
-            }
-            
-            // Shuffle and set password
-            newPassword = shuffleString(newPassword);
-            passwordInput.value = newPassword;
-            
-            // Update UI
-            addHistory(newPassword);
-            checkPasswordStrength(newPassword);
-            updateVisualHash(newPassword);
-            passwordInput.classList.add('animate-pulse');
-            setTimeout(() => passwordInput.classList.remove('animate-pulse'), 1000);
+            reqElements.forEach(req => {
+                const el = document.getElementById(req.id);
+                if (el) {
+                    const icon = el.querySelector('.requirement-icon');
+                    if (icon) {
+                        if (req.met) {
+                            icon.className = 'requirement-icon fas fa-check met';
+                        } else {
+                            icon.className = 'requirement-icon fas fa-times unmet';
+                        }
+                    }
+                }
+            });
         }
 
         // Update strength meter fill
-        function updateStrengthMeter(score) {
+        function updateStrengthMeterFill(score) {
             const strengthMeter = document.querySelector('.strength-meter-fill');
             if (!strengthMeter) return;
             
@@ -1135,127 +1129,7 @@
             strengthMeter.style.width = `${strengthPercentage}%`;
         }
 
-        // Call init when page loads
-        window.addEventListener('load', () => {
-            // Wait for DOM to be ready
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                document.addEventListener("DOMContentLoaded", init);
-            }
-        });
-
-        // Confetti particle creation
-        function createConfettiParticle(x, y) {
-            const particle = document.createElement('div');
-            particle.className = 'confetti';
-            particle.style.left = `${x}%`;
-            particle.style.top = `${y}%`;
-            document.body.appendChild(particle);
-            
-            const size = Math.random() * 6 + 4;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            
-            const animation = particle.animate(
-                {
-                    transform: ['translateY(0) rotate(0)', 'translateY(100vh) rotate(360deg)'],
-                    opacity: [1, 0]
-                },
-                {
-                    duration: 3000,
-                    easing: 'linear'
-                }
-            );
-            
-            animation.onfinish = () => particle.remove();
-        }
-
-        // Confetti animation trigger
-        function triggerConfetti() {
-            const strengthMeter = document.querySelector('.strength-meter-fill');
-            if (!strengthMeter) return;
-            
-            const strengthWidth = parseFloat(strengthMeter.style.width);
-            if (strengthWidth > 70) {
-                for (let i = 0; i < 50; i++) {
-                    createConfettiParticle(Math.random() * 100, Math.random() * 100);
-                }
-            }
-        }
-
-        // Update requirement checks
-        function updateRequirements(pwd) {
-            const reqs = {
-                length: pwd.length >= 8,
-                uppercase: /[A-Z]/.test(pwd),
-                lowercase: /[a-z]/.test(pwd),
-                number: /\d/.test(pwd),
-                symbol: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
-                notAmbiguous: !/[lI1O0]/.test(pwd)
-            };
-            
-            // Update requirement icons
-            const reqElements = [
-                { id: 'req-length', met: reqs.length },
-                { id: 'req-uppercase', met: reqs.uppercase },
-                { id: 'req-lowercase', met: reqs.lowercase },
-                { id: 'req-number', met: reqs.number },
-                { id: 'req-symbol', met: reqs.symbol },
-                { id: 'req-ambiguous', met: reqs.notAmbiguous }
-            ];
-            
-            reqElements.forEach(req => {
-                const el = document.getElementById(req.id);
-                if (el) {
-                    el.innerHTML = req.met ? '✅' : '❌';
-                    el.className = req.met ? 'requirement-icon fas fa-check met' : 'requirement-icon fas fa-times unmet';
-                }
-            });
-        }
-
-        // Update strength meter and feedback
-        function updateStrengthMeterAndFeedback(pwd) {
-            const result = zxcvbn(pwd);
-            const score = result.score;
-            
-            // Update strength meter
-            updateStrengthMeter(score);
-            
-            // Update feedback
-            const feedbackList = document.getElementById('feedbackList');
-            if (result.feedback.suggestions.length > 0) {
-                feedbackList.innerHTML = '';
-                result.feedback.suggestions.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span class="feedback-icon fas fa-exclamation-circle"></span>${item}`;
-                    feedbackList.appendChild(li);
-                });
-            } else {
-                feedbackList.innerHTML = '<li><span class="feedback-icon fas fa-check-circle"></span>Great job! Your password is strong.</li>';
-            }
-            
-            // Update crack time
-            const crackTimeDiv = document.getElementById('crackTime');
-            if (crackTimeDiv) {
-                crackTimeDiv.textContent = `Estimated crack time: ${result.crack_times_display.online_no_guesses_per_second}`;
-            }
-            
-            // Update security persona
-            const personaDiv = document.getElementById('securityPersona');
-            if (personaDiv) {
-                let persona;
-                if (score <= 1) {
-                    personaDiv.innerHTML = `<span>🏠 Glass House Dweller</span>`;
-                } else if (score <= 3) {
-                    personaDiv.innerHTML = `<span>🔒 Vault Guardian</span>`;
-                } else {
-                    personaDiv.innerHTML = `<span>🛡️ Fort Knox Defender</span>`;
-                }
-            }
-        }
-
-        // Setup click handlers
+        // Setup event listeners
         function setupEventListeners() {
             // Copy to clipboard
             document.getElementById('copyBtn').addEventListener('click', () => {
@@ -1274,19 +1148,28 @@
             document.querySelector('.password-display').appendChild(toggleButton);
 
             toggleButton.addEventListener('click', () => {
-                const input = document.getElementById('passwordInput');
-                const type = input.type === 'password' ? 'text' : 'password';
-                input.type = type;
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
                 toggleButton.classList.toggle('fa-eye');
                 toggleButton.classList.toggle('fa-eye-slash');
             });
 
             // Apply pulsing effect to generate button
             document.getElementById('generateBtn').addEventListener('click', () => {
-                document.getElementById('generateBtn').classList.add('pulse');
-                setTimeout(() => document.getElementById('generateBtn').classList.remove('pulse'), 1000);
+                document.getElementById('generateBtn').classList.add('animate-pulse');
+                setTimeout(() => document.getElementById('generateBtn').classList.remove('animate-pulse'), 1000);
             });
         }
+
+        // Call init when page loads
+        window.addEventListener('load', () => {
+            // Wait for DOM to be ready
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                document.addEventListener("DOMContentLoaded", init);
+            }
+        });
 
         // Main initialization function
         function init() {
