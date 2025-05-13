@@ -3,103 +3,1145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Password Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter :wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Hacker Password Generator</title>
+    <style>
+        :root {
+            --primary: #00ff00;
+            --secondary: #00cc00;
+            --tertiary: #009900;
+            --dark: #000000;
+            --light: #ffffff;
+            --gray: #333333;
+            --very-weak: #ff0000;
+            --weak: #ff6600;
+            --moderate: #ffcc00;
+            --strong: #66ff66;
+            --very-strong: #00ff00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hacker-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .hacker-line {
+            position: absolute;
+            white-space: pre;
+            font-size: 1.5rem;
+            opacity: 0.1;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .password-display {
+            background: transparent;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            padding: 1rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+            position: relative;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .password-display:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .password-display input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .password-display .controls {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .password-display .controls button {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .password-display .controls button:hover {
+            background-color: var(--primary);
+            color: var(--dark);
+            border-color: var(--primary);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, var(--secondary) 10%, transparent 10.01%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+
+        .generate-btn.animate::before {
+            transform: translate(-50%, -50%) scale(10);
+            opacity: 0;
+        }
+
+        .strength-meter {
+            height: 10px;
+            background: var(--gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .strength-meter-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: all 0.5s ease-out;
+        }
+
+        .strength-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .crack-time {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .options {
+            margin-bottom: 2rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .option label {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+        .slider-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .feedback li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback li::before {
+            content: '⚠️';
+            margin-right: 0.5rem;
+            color: var(--moderate);
+        }
+
+        .history {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .history h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .history ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .history li {
+            cursor: pointer;
+            padding: 0.3rem 0;
+            transition: color 0.3s;
+        }
+
+        .history li:hover {
+            color: var(--secondary);
+        }
+
+        .requirements {
+            margin-top: 1.5rem;
+        }
+
+        .requirements li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .requirements li::before {
+            content: '❌';
+            margin-right: 0.5rem;
+            color: var(--very-weak);
+            transition: all 0.3s;
+        }
+
+        .requirements li.met::before {
+            content: '✅';
+            color: var(--very-strong);
+        }
+
+        .visual-hash {
+            width: 100px;
+            height: 100px;
+            margin: 1rem auto;
+            display: block;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+        }
+
+        .security-persona {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .security-persona span {
+            display: inline-block;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .mode-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .dark-mode .mode-toggle {
+            color: var(--primary);
+        }
+
+        .light-mode {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .light-mode .password-display input {
+            color: var(--dark);
+        }
+
+        .light-mode .password-display {
+            border-color: var(--dark);
+        }
+
+        .light-mode .password-display .controls button {
+            color: var(--dark);
+            border-color: var(--dark);
+        }
+
+        .light-mode .password-display .controls button:hover {
+            background-color: var(--dark);
+            color: var(--light);
+            border-color: var(--dark);
+        }
+
+        .light-mode .strength-meter {
+            background: #ddd;
+        }
+
+        .light-mode .requirements li::before {
+            color: #ff0000;
+        }
+
+        .light-mode .requirements li.met::before {
+            color: #00ff00;
+        }
+
+        .light-mode .security-persona {
+            color: #333;
+        }
+
+        .feature-cards {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .footer.light-mode {
+            color: #333;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
-<body class="dark:bg-gray-900 dark:text-white transition-colors duration-300">
-    <div class="container mx-auto p-4 max-w-md">
-        <h1 class="text-3xl font-bold mb-6 text-center">🔒 Password Generator</h1>
+<body class="dark-mode">
+    <div class="hacker-background" id="hackerBackground"></div>
 
-        <div class="relative mb-6">
-            <input 
-                type="text" 
-                id="password-display" 
-                class="w-full p-3 pl-4 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 dark:border-gray-700" 
-                readonly
-            />
-            <button 
-                id="copy-btn" 
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                title="Copy to clipboard"
-            >
-                📋
-            </button>
-        </div>
+    <div class="container">
+        <div class="mode-toggle" id="modeToggle">🌞</div>
 
-        <div class="mb-4">
-            <div class="flex justify-between mb-1">
-                <span>Password Strength:</span>
-                <span id="strength-label">Very Weak 🔴</span>
-            </div>
-            <div class="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div id="strength-meter" class="h-full w-0 transition-all duration-500"></div>
-            </div>
-            <div id="crack-time" class="mt-2 text-sm italic text-gray-600 dark:text-gray-400">
-                Estimated crack time: N/A
+        <h1>Password Generator</h1>
+
+        <div class="password-display" id="passwordDisplay">
+            <input type="text" id="passwordInput" readonly>
+            <div class="controls">
+                <button id="copyBtn">📋</button>
             </div>
         </div>
 
-        <div class="mb-6">
-            <ul id="feedback" class="space-y-1 text-sm">
-                <li class="text-red-500">• Add more characters</li>
-                <li class="text-red-500">• Add uppercase letters</li>
+        <canvas class="visual-hash" id="visualHash"></canvas>
+
+        <div class="security-persona" id="securityPersona">
+            <span>🛡️ Fort Knox Defender</span>
+        </div>
+
+        <button class="generate-btn" id="generateBtn">GENERATE PASSWORD</button>
+
+        <div class="strength-label" id="strengthLabel">
+            <span id="strengthText">Very Weak 🔴</span>
+            <span id="strengthScore">0%</span>
+        </div>
+
+        <div class="strength-meter">
+            <div class="strength-meter-fill" id="strengthMeter"></div>
+        </div>
+
+        <div class="crack-time" id="crackTime">
+            Estimated crack time: N/A
+        </div>
+
+        <div class="requirements" id="requirements">
+            <h3>Password Requirements:</h3>
+            <ul>
+                <li id="req-length">Minimum 8 characters</li>
+                <li id="req-uppercase">At least one uppercase letter</li>
+                <li id="req-lowercase">At least one lowercase letter</li>
+                <li id="req-number">At least one number</li>
+                <li id="req-symbol">At least one special character</li>
+                <li id="req-ambiguous">No ambiguous characters (lI1O0)</li>
             </ul>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <button id="generate-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
-                Generate Password
-            </button>
-            <button id="passphrase-btn" class="py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors">
+        <div class="slider-container">
+            <label for="lengthSlider">Password Length: <span id="lengthValue">12</span></label>
+            <input type="range" id="lengthSlider" min="4" max="64" value="12">
+        </div>
+
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="uppercaseCheck" checked>
+                <label for="uppercaseCheck">Include Uppercase Letters (A-Z)</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="lowercaseCheck" checked>
+                <label for="lowercaseCheck">Include Lowercase Letters (a-z)</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="numbersCheck" checked>
+                <label for="numbersCheck">Include Numbers (0-9)</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="symbolsCheck" checked>
+                <label for="symbolsCheck">Include Symbols (!@#$%^&*)</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="excludeAmbiguousCheck" checked>
+                <label for="excludeAmbiguousCheck">Exclude Ambiguous Characters (lI1O0)</label>
+            </div>
+        </div>
+
+        <div class="options">
+            <button id="passphraseBtn" style="background: var(--tertiary); color: black; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer;">
                 Generate Passphrase
             </button>
         </div>
 
-        <div class="mb-6">
-            <label for="password-length" class="block mb-2">Password Length: <span id="length-value">12</span></label>
-            <input 
-                type="range" 
-                id="password-length" 
-                min="4" 
-                max="64" 
-                value="12" 
-                class="w-full accent-blue-600"
-            />
+        <div class="history">
+            <h3>Recent Passwords:</h3>
+            <ul id="historyList"></ul>
         </div>
 
-        <div class="mb-6 space-y-2">
-            <label class="flex items-center">
-                <input type="checkbox" id="uppercase" checked class="mr-2">
-                Include Uppercase Letters (A-Z)
-            </label>
-            <label class="flex items-center">
-                <input type="checkbox" id="lowercase" checked class="mr-2">
-                Include Lowercase Letters (a-z)
-            </label>
-            <label class="flex items-center">
-                <input type="checkbox" id="numbers" checked class="mr-2">
-                Include Numbers (0-9)
-            </label>
-            <label class="flex items-center">
-                <input type="checkbox" id="symbols" checked class="mr-2">
-                Include Symbols (!@#$%^&*)
-            </label>
-            <label class="flex items-center">
-                <input type="checkbox" id="exclude-ambiguous" checked class="mr-2">
-                Exclude Ambiguous Characters (lI1O0)
-            </label>
+        <div class="feedback" id="feedback">
+            <h3>Improvement Suggestions:</h3>
+            <ul id="feedbackList"></ul>
         </div>
 
-        <div class="mb-6">
-            <h3 class="font-medium mb-2">Recent Passwords:</h3>
-            <div id="history" class="max-h-24 overflow-y-auto text-sm space-y-1">
-                <!-- History will be populated by JavaScript -->
+        <div class="feature-cards">
+            <div class="feature-card">
+                <h3>Memory Triggers</h3>
+                <p>Create visual anchors for better retention</p>
+            </div>
+            <div class="feature-card">
+                <h3>Security Personas</h3>
+                <p>Get personalized guidance</p>
+            </div>
+            <div class="feature-card">
+                <h3>Compliance Helper</h3>
+                <p>Meet regulatory standards</p>
+            </div>
+            <div class="feature-card">
+                <h3>Password Aging</h3>
+                <p>Track password decay over time</p>
             </div>
         </div>
+
+        <div class="footer" id="lastGenerated"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js "></script>
-    <script src="script.js"></script>
+    <script>
+        // DOM Elements
+        const passwordInput = document.getElementById('passwordInput');
+        const copyBtn = document.getElementById('copyBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const requirements = {
+            length: document.getElementById('req-length'),
+            uppercase: document.getElementById('req-uppercase'),
+            lowercase: document.getElementById('req-lowercase'),
+            number: document.getElementById('req-number'),
+            symbol: document.getElementById('req-symbol'),
+            ambiguous: document.getElementById('req-ambiguous')
+        };
+        const strengthMeter = document.getElementById('strengthMeter');
+        const strengthText = document.getElementById('strengthText');
+        const strengthScore = document.getElementById('strengthScore');
+        const feedbackList = document.getElementById('feedbackList');
+        const historyList = document.getElementById('historyList');
+        const lengthSlider = document.getElementById('lengthSlider');
+        const lengthValue = document.getElementById('lengthValue');
+        const visualHash = document.getElementById('visualHash');
+        const securityPersona = document.getElementById('securityPersona');
+        const hackerBackground = document.getElementById('hackerBackground');
+        const modeToggle = document.getElementById('modeToggle');
+        const lastGenerated = document.getElementById('lastGenerated');
+
+        // State variables
+        let passwordHistory = [];
+        let currentLength = parseInt(lengthSlider.value);
+        let isDarkMode = true;
+
+        // Character sets
+        const uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+        const numberChars = "0123456789";
+        const symbolChars = "!@#$%^&*()-_=+[]{}|;:,.<>?/";
+        const ambiguousChars = "lI1O0";
+
+        // Security personas
+        const personas = {
+            'Glass House Dweller': '🏠',
+            'Vault Guardian': '🔒',
+            'Fort Knox Defender': '🛡️'
+        };
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            lengthValue.textContent = currentLength;
+            updateVisualHash();
+            updateRequirements();
+            generatePassword();
+            
+            // Create hacker background
+            createHackerBackground();
+        });
+
+        lengthSlider.addEventListener('input', (e) => {
+            currentLength = parseInt(e.target.value);
+            lengthValue.textContent = currentLength;
+            if (passwordInput.value && !passwordInput.value.includes('Select')) {
+                generatePassword();
+            }
+        });
+
+        generateBtn.addEventListener('click', () => {
+            generatePassword();
+            triggerConfetti();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(passwordInput.value)
+                .then(() => {
+                    copyBtn.textContent = '✅';
+                    setTimeout(() => copyBtn.textContent = '📋', 2000);
+                });
+        });
+
+        document.getElementById('passphraseBtn').addEventListener('click', () => {
+            generatePassphrase();
+            triggerConfetti();
+        });
+
+        document.getElementById('uppercaseCheck').addEventListener('change', () => {
+            if (!document.getElementById('uppercaseCheck').checked &&
+                !document.getElementById('lowercaseCheck').checked &&
+                !document.getElementById('numbersCheck').checked &&
+                !document.getElementById('symbolsCheck').checked) {
+                alert('Please select at least one character type');
+            } else {
+                generatePassword();
+            }
+        });
+
+        document.querySelectorAll('.option input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', () => {
+                if (input.id === 'uppercaseCheck' ||
+                    input.id === 'lowercaseCheck' ||
+                    input.id === 'numbersCheck' ||
+                    input.id === 'symbolsCheck') {
+                    if (!document.getElementById('uppercaseCheck').checked &&
+                        !document.getElementById('lowercaseCheck').checked &&
+                        !document.getElementById('numbersCheck').checked &&
+                        !document.getElementById('symbolsCheck').checked) {
+                        passwordInput.value = 'Select at least one character type';
+                        return;
+                    }
+                }
+                generatePassword();
+            });
+        });
+
+        modeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            document.body.classList.toggle('dark-mode');
+            modeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '🌞';
+            updateVisualHash();
+        });
+
+        function createHackerBackground() {
+            const lineCount = 20;
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            for (let i = 0; i < lineCount; i++) {
+                const line = document.createElement('div');
+                line.className = 'hacker-line';
+                line.style.top = `${i * 5}px`;
+                line.style.left = `${Math.random() * 100}%`;
+                line.textContent = Array.from({length: 80}, () => 
+                    chars[Math.floor(Math.random() * chars.length)]
+                ).join('');
+                hackerBackground.appendChild(line);
+            }
+        }
+
+        function getCharacterPool() {
+            let pool = '';
+            if (document.getElementById('uppercaseCheck').checked) pool += uppercaseChars;
+            if (document.getElementById('lowercaseCheck').checked) pool += lowercaseChars;
+            if (document.getElementById('numbersCheck').checked) pool += numberChars;
+            if (document.getElementById('symbolsCheck').checked) pool += symbolChars;
+
+            if (document.getElementById('excludeAmbiguousCheck').checked) {
+                pool = [...new Set(pool.split('').filter(c => !ambiguousChars.includes(c)).join(''));
+            }
+
+            return pool;
+        }
+
+        function getRandomChar(chars) {
+            return chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        function shuffleString(string) {
+            const array = string.split('');
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array.join('');
+        }
+
+        function addHistory(pwd) {
+            if (pwd && !pwd.startsWith('Select')) {
+                passwordHistory.unshift(pwd);
+                passwordHistory = [...new Set(passwordHistory)].slice(0, 5);
+                
+                historyList.innerHTML = '';
+                passwordHistory.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', () => {
+                        passwordInput.value = item;
+                        checkPasswordStrength(item);
+                    });
+                    historyList.appendChild(li);
+                });
+            }
+        }
+
+        function updateRequirements(pwd = passwordInput.value) {
+            const reqs = {
+                length: pwd.length >= 8,
+                uppercase: /[A-Z]/.test(pwd),
+                lowercase: /[a-z]/.test(pwd),
+                number: /\d/.test(pwd),
+                symbol: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+                notAmbiguous: !/[lI1O0]/.test(pwd)
+            };
+
+            Object.entries(reqs).forEach(([key, met]) => {
+                requirements[key].classList.toggle('met', met);
+            });
+        }
+
+        function checkPasswordStrength(pwd) {
+            if (pwd.length === 0) {
+                resetUI();
+                return;
+            }
+
+            // Basic checks
+            const hasUppercase = /[A-Z]/.test(pwd);
+            const hasLowercase = /[a-z]/.test(pwd);
+            const hasNumber = /\d/.test(pwd);
+            const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+
+            // Calculate score based on character variety and length
+            let score = 0;
+            if (hasUppercase) score++;
+            if (hasLowercase) score++;
+            if (hasNumber) score++;
+            if (hasSymbol) score++;
+
+            score += Math.floor(pwd.length / 4);
+
+            // Update requirement checks
+            updateRequirements(pwd);
+
+            // Generate feedback
+            const feedback = [];
+            if (!hasUppercase) feedback.push("Add uppercase letters");
+            if (!hasLowercase) feedback.push("Add lowercase letters");
+            if (!hasNumber) feedback.push("Add numbers");
+            if (!hasSymbol) feedback.push("Add special characters");
+            if (pwd.length < 12) feedback.push("Use at least 12 characters");
+
+            // Calculate crack time estimate
+            const times = [
+                "< 1 second",
+                "Seconds to minutes",
+                "Minutes to hours",
+                "Hours to days",
+                "Days to weeks",
+                "Weeks to months",
+                "Months to years",
+                "Years to decades",
+                "Decades to centuries",
+                "Centuries"
+            ];
+
+            const baseIndex = Math.min(9, score + Math.floor((pwd.length - 8) / 2));
+            const crackTime = times[baseIndex];
+
+            // Update UI
+            updateUI(pwd, score, crackTime, feedback);
+        }
+
+        function updateUI(password, score, crackTime, feedback) {
+            // Update strength meter
+            const percentage = ((score + 1) / 10) * 100;
+            strengthMeter.style.width = `${percentage}%`;
+
+            // Set color based on strength
+            if (score <= 1) {
+                strengthMeter.style.backgroundColor = 'var(--very-weak)';
+                strengthText.textContent = 'Very Weak 🔴';
+            } else if (score === 2) {
+                strengthMeter.style.backgroundColor = 'var(--weak)';
+                strengthText.textContent = 'Weak ⚠️';
+            } else if (score === 3) {
+                strengthMeter.style.backgroundColor = 'var(--moderate)';
+                strengthText.textContent = 'Moderate 🟡';
+            } else if (score <= 5) {
+                strengthMeter.style.backgroundColor = 'var(--strong)';
+                strengthText.textContent = 'Strong ✅';
+            } else {
+                strengthMeter.style.backgroundColor = 'var(--very-strong)';
+                strengthText.textContent = 'Very Strong 💪';
+            }
+
+            strengthScore.textContent = `${percentage.toFixed(0)}%`;
+            document.getElementById('crackTime').textContent = `Estimated time to crack: ${crackTime}`;
+
+            // Update feedback
+            const feedbackList = document.getElementById('feedbackList');
+            feedbackList.innerHTML = '';
+            
+            if (feedback.length > 0) {
+                feedback.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>⚠️</span> ${item}`;
+                    feedbackList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.innerHTML = '<span>✅</span> Great job! Your password is strong.';
+                feedbackList.appendChild(li);
+            }
+
+            // Update security persona
+            if (score <= 2) {
+                securityPersona.innerHTML = `<span>🏠 Glass House Dweller</span>`;
+            } else if (score <= 4) {
+                securityPersona.innerHTML = `<span>🔒 Vault Guardian</span>`;
+            } else {
+                securityPersona.innerHTML = `<span>🛡️ Fort Knox Defender</span>`;
+            }
+
+            // Update timestamp
+            const now = new Date();
+            lastGenerated.textContent = `Last generated: ${now.toLocaleTimeString()} • Age: ${getPasswordAge()}`;
+        }
+
+        function resetUI() {
+            strengthMeter.style.width = '0%';
+            strengthMeter.style.backgroundColor = 'var(--primary)';
+            strengthText.textContent = 'Very Weak 🔴';
+            strengthScore.textContent = '0%';
+            feedbackList.innerHTML = '';
+            document.getElementById('crackTime').textContent = 'Estimated time to crack: N/A';
+            Object.values(requirements).forEach(req => req.classList.remove('met'));
+            securityPersona.innerHTML = '<span>🏠 Glass House Dweller</span>';
+        }
+
+        function generatePassword() {
+            const pool = getCharacterPool();
+            if (pool.length === 0) {
+                passwordInput.value = 'Select at least one character type';
+                return;
+            }
+
+            let newPassword = '';
+
+            // Ensure at least one of each selected category
+            if (document.getElementById('uppercaseCheck').checked) newPassword += getRandomChar(uppercaseChars);
+            if (document.getElementById('lowercaseCheck').checked) newPassword += getRandomChar(lowercaseChars);
+            if (document.getElementById('numbersCheck').checked) newPassword += getRandomChar(numberChars);
+            if (document.getElementById('symbolsCheck').checked) newPassword += getRandomChar(symbolChars);
+
+            // Fill the rest of the password
+            while (newPassword.length < currentLength) {
+                newPassword += getRandomChar(pool);
+            }
+
+            // Shuffle to avoid predictable patterns
+            newPassword = shuffleString(newPassword);
+            
+            passwordInput.value = newPassword;
+            addHistory(newPassword);
+            checkPasswordStrength(newPassword);
+            passwordInput.classList.add('pulse');
+            setTimeout(() => passwordInput.classList.remove('pulse'), 1000);
+        }
+
+        function generatePassphrase() {
+            const wordList = ["correct", "horse", "battery", "staple", "dragon", "cloud", "sunny", "moonlight", "robot", "nebula", "galaxy", "shield"];
+            const separator = "-";
+            const capitalize = true;
+            const wordCount = 4;
+
+            const parts = [];
+            for (let i = 0; i < wordCount; i++) {
+                let word = wordList[Math.floor(Math.random() * wordList.length)];
+                if (capitalize) {
+                    word = word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                parts.push(word);
+            }
+
+            let phrase = parts.join(separator);
+            passwordInput.value = phrase;
+            addHistory(phrase);
+            checkPasswordStrength(phrase);
+            passwordInput.classList.add('pulse');
+            setTimeout(() => passwordInput.classList.remove('pulse'), 1000);
+        }
+
+        function getPasswordAge() {
+            const ageInMinutes = Math.floor(Math.random() * 100);
+            if (ageInMinutes < 15) return 'Fresh';
+            if (ageInMinutes < 60) return 'Recent';
+            if (ageInMinutes < 240) return 'Moderate Age';
+            return 'Needs Update';
+        }
+
+        function triggerConfetti() {
+            const colors = ['#FFD700', '#00BFFF', '#FF69B4', '#00FF00', '#FFA500'];
+            const duration = 3000;
+            const end = Date.now() + duration;
+            
+            (function frame() {
+                const now = Date.now();
+                if (now < end) {
+                    requestAnimationFrame(frame);
+                }
+                
+                const count = 5;
+                for (let i = 0; i < count; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.top = `${Math.random() * 100}%`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    document.body.appendChild(confetti);
+                    
+                    const size = Math.random() * 6 + 4;
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    
+                    const animation = confetti.animate(
+                        {
+                            transform: ['translateY(0) rotate(0)', 
+                                        'translateY(100vh) rotate(360deg)'],
+                            opacity: [1, 0]
+                        },
+                        {
+                            duration: 3000,
+                            easing: 'linear'
+                        }
+                    );
+                    
+                    animation.onfinish = () => confetti.remove();
+                }
+            })();
+        }
+
+        function updateVisualHash(pwd = passwordInput.value) {
+            const canvas = document.getElementById('visualHash');
+            const ctx = canvas.getContext('2d');
+            const size = 100;
+            canvas.width = size;
+            canvas.height = size;
+
+            // Create hash from password
+            const hash = pwd.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            
+            // Create unique pattern based on password
+            const hue = hash % 360;
+            const saturation = 70 + (hash % 20);
+            const lightness = 50 + (hash % 10);
+            
+            ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Add some texture
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let i = 0; i < 10; i++) {
+                ctx.beginPath();
+                ctx.arc(
+                    Math.sin(i * 0.5) * size * 0.3 + size * 0.5,
+                    Math.cos(i * 0.7) * size * 0.3 + size * 0.5,
+                    5 + Math.random() * 10,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+        }
+
+        function updateVisualHashOnInput() {
+            updateVisualHash();
+            checkPasswordStrength(passwordInput.value);
+        }
+
+        passwordInput.addEventListener('input', updateVisualHashOnInput);
+
+        function createConfettiParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'confetti';
+            particle.style.left = `${x}%`;
+            particle.style.top = `${y}%`;
+            particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+            document.body.appendChild(particle);
+            
+            const size = Math.random() * 6 + 4;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            const animation = particle.animate(
+                {
+                    transform: ['translateY(0) rotate(0)', 
+                                'translateY(100vh) rotate(360deg)'],
+                    opacity: [1, 0]
+                },
+                {
+                    duration: 3000,
+                    easing: 'linear'
+                }
+            );
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        function triggerConfetti() {
+            if (strengthMeter.offsetWidth / strengthMeter.parentElement.offsetWidth > 0.7) {
+                for (let i = 0; i < 50; i++) {
+                    createConfettiParticle(Math.random() * 100, Math.random() * 100);
+                }
+            }
+        }
+
+        function updateVisualHashOnInput() {
+            updateVisualHash();
+            checkPasswordStrength(passwordInput.value);
+        }
+
+        function getPasswordEntropy(pwd) {
+            const charsetSize = (
+                (/[A-Z]/.test(pwd) ? 26 : 0) +
+                (/[a-z]/.test(pwd) ? 26 : 0) +
+                (/\d/.test(pwd) ? 10 : 0) +
+                (/[!@#$%^&*]/.test(pwd) ? 32 : 0)
+            );
+            
+            return charsetSize > 0 ? (Math.log2(charsetSize) * pwd.length).toFixed(2) : 0;
+        }
+
+        function simulateBreachCheck(pwd) {
+            const commonPasswords = ['password', '123456', 'qwerty', 'abc123'];
+            return commonPasswords.some(p => pwd.toLowerCase().includes(p)) ?
+                '⚠️ Warning: This password contains common patterns found in breaches!' :
+                '';
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function updateUIForLightMode(isLight) {
+            document.body.classList.toggle('light-mode', isLight);
+            document.body.classList.toggle('dark-mode', !isLight);
+            modeToggle.textContent = isLight ? '🌙' : '🌞';
+        }
+
+        function updateVisualHash(pwd = passwordInput.value) {
+            const canvas = document.getElementById('visualHash');
+            const ctx = canvas.getContext('2d');
+            const size = 100;
+            canvas.width = size;
+            canvas.height = size;
+
+            // Create a simple visual hash based on password
+            const hash = pwd.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            
+            // Create a unique pattern based on the hash
+            const hue = hash % 360;
+            const saturation = 70 + (hash % 20);
+            const lightness = 50 + (hash % 10);
+            
+            ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Add some texture
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let i = 0; i < 10; i++) {
+                ctx.beginPath();
+                ctx.arc(
+                    Math.sin(i * 0.5) * size * 0.3 + size * 0.5,
+                    Math.cos(i * 0.7) * size * 0.3 + size * 0.5,
+                    5 + Math.random() * 10,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+        }
+
+        // Initialize
+        function init() {
+            // Initial password generation
+            generatePassword();
+
+            // Setup event listeners
+            document.getElementById('uppercaseCheck').addEventListener('change', () => {
+                if (!document.getElementById('uppercaseCheck').checked &&
+                    !document.getElementById('lowercaseCheck').checked &&
+                    !document.getElementById('numbersCheck').checked &&
+                    !document.getElementById('symbolsCheck').checked) {
+                    passwordInput.value = 'Select at least one character type';
+                    return;
+                }
+                generatePassword();
+            });
+
+            document.getElementById('lowercaseCheck').addEventListener('change', generatePassword);
+            document.getElementById('numbersCheck').addEventListener('change', generatePassword);
+            document.getElementById('symbolsCheck').addEventListener('change', generatePassword);
+            document.getElementById('excludeAmbiguousCheck').addEventListener('change', generatePassword);
+        }
+
+        init();
+    </script>
 </body>
-</html>
+    </html>
