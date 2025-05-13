@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Password Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter :wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark:bg-gray-900 dark:text-white transition-colors duration-300">
+    <div class="container mx-auto p-4 max-w-md">
+        <h1 class="text-3xl font-bold mb-6 text-center">🔒 Password Generator</h1>
+
+        <div class="relative mb-6">
+            <input 
+                type="text" 
+                id="password-display" 
+                class="w-full p-3 pl-4 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 dark:border-gray-700" 
+                readonly
+            />
+            <button 
+                id="copy-btn" 
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                title="Copy to clipboard"
+            >
+                📋
+            </button>
+        </div>
+
+        <div class="mb-4">
+            <div class="flex justify-between mb-1">
+                <span>Password Strength:</span>
+                <span id="strength-label">Very Weak 🔴</span>
+            </div>
+            <div class="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div id="strength-meter" class="h-full w-0 transition-all duration-500"></div>
+            </div>
+            <div id="crack-time" class="mt-2 text-sm italic text-gray-600 dark:text-gray-400">
+                Estimated crack time: N/A
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <ul id="feedback" class="space-y-1 text-sm">
+                <li class="text-red-500">• Add more characters</li>
+                <li class="text-red-500">• Add uppercase letters</li>
+            </ul>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button id="generate-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+                Generate Password
+            </button>
+            <button id="passphrase-btn" class="py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors">
+                Generate Passphrase
+            </button>
+        </div>
+
+        <div class="mb-6">
+            <label for="password-length" class="block mb-2">Password Length: <span id="length-value">12</span></label>
+            <input 
+                type="range" 
+                id="password-length" 
+                min="4" 
+                max="64" 
+                value="12" 
+                class="w-full accent-blue-600"
+            />
+        </div>
+
+        <div class="mb-6 space-y-2">
+            <label class="flex items-center">
+                <input type="checkbox" id="uppercase" checked class="mr-2">
+                Include Uppercase Letters (A-Z)
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" id="lowercase" checked class="mr-2">
+                Include Lowercase Letters (a-z)
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" id="numbers" checked class="mr-2">
+                Include Numbers (0-9)
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" id="symbols" checked class="mr-2">
+                Include Symbols (!@#$%^&*)
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" id="exclude-ambiguous" checked class="mr-2">
+                Exclude Ambiguous Characters (lI1O0)
+            </label>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="font-medium mb-2">Recent Passwords:</h3>
+            <div id="history" class="max-h-24 overflow-y-auto text-sm space-y-1">
+                <!-- History will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js "></script>
+    <script src="script.js"></script>
+</body>
+</html>
