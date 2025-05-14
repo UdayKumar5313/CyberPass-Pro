@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberPass Pro</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
@@ -21,13 +23,14 @@
         <div class="strength-meter">
             <p>Strength Analysis: Military Grade Encryption</p>
             <div id="strength"></div>
-            <canvas id="particle-canvas"></canvas>
+            <p id="strength-score">ZXCVBN Score: 4/4</p>
         </div>
         <div class="options">
             <div class="option-group">
                 <label><input type="radio" name="type" value="password" checked onclick="showOptions('password')"> Password</label>
                 <label><input type="radio" name="type" value="passphrase" onclick="showOptions('passphrase')"> Passphrase</label>
                 <label><input type="radio" name="type" value="pin" onclick="showOptions('pin')"> PIN Code</label>
+                <label><input type="radio" name="type" value="phonetic" onclick="showOptions('phonetic')"> Phonetic</label>
             </div>
             <div id="password-options" class="option-group">
                 <label><input type="checkbox" id="uppercase" checked> Caps (A-Z)</label>
@@ -42,6 +45,9 @@
             <div id="pin-options" class="option-group" style="display: none;">
                 <label><input type="checkbox" id="include-digits"> Include Digits</label>
             </div>
+            <div id="phonetic-options" class="option-group" style="display: none;">
+                <label><input type="checkbox" id="include-phonetic"> Include Phonetic</label>
+            </div>
             <div class="option-group">
                 <label>Glyph Count: <input type="number" id="length" min="4" max="32" value="20"></label>
             </div>
@@ -52,23 +58,19 @@
                 <label><input type="checkbox" id="exclude-similar"> Exclude Similar Glyphs</label>
             </div>
         </div>
-        <button onclick="generatePassword()">Regenerate Access Code</button>
-        <button onclick="regenerateLastPassword()">Regenerate Last Password</button>
+        <button class="generate-btn" onclick="generatePassword()">Regenerate Access Code</button>
         <div class="additional-features">
             <button onclick="saveToArchive()">Code Archive (1)</button>
             <button onclick="generateQRCode()">Transmit via QR</button>
             <button onclick="openPasswordVault()">Password Vault</button>
             <button onclick="simulateBreachScan()">Breach Scan (Sim)</button>
+            <button onclick="transferData()">Data Transfer</button>
         </div>
         <div class="password-history">
-            <h3>Last 5 Generated Passwords</h3>
+            <h3>Password History</h3>
             <ul id="password-history-list"></ul>
         </div>
-        <div class="security-analysis">
-            <p>Entropy: <span id="entropy">0</span> bits</p>
-            <p>Crack Time: <span id="crack-time">0</span> seconds</p>
-            <p id="common-password-warning" style="color: red;"></p>
-        </div>
+        <canvas id="entropyChart"></canvas>
         <div id="qrcode" style="display: none;"></div>
     </div>
     <div id="popup" class="popup">
