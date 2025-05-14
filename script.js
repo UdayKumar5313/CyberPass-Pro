@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+Nu document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const label = document.getElementById('passwordLabel');
 
