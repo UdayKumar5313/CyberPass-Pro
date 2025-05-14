@@ -1,7 +1,27 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const label = document.getElementById('passwordLabel');
+
+    passwordInput.addEventListener('focus', () => {
+        label.style.transform = "translateY(-20px) scale(0.8)";
+        label.style.color = "#4361ee";
+    });
+
+    passwordInput.addEventListener('blur', () => {
+        if (!passwordInput.value) {
+            label.style.transform = "translateY(0) scale(1)";
+            label.style.color = "#aaa";
+        }
+    });
+});
+
 let passwordHistory = [];
 const commonPasswords = ['password', '123456', '123456789', '12345678', '1234567', '12345', '1234567890', '1234', 'qwerty', 'abc123'];
 
 function generatePassword() {
+    const loader = document.getElementById('generationLoader');
+    loader.style.display = 'flex';
+
     const type = document.querySelector('input[name="type"]:checked').value;
     const length = document.getElementById('length').value;
     const uppercase = document.getElementById('uppercase') ? document.getElementById('uppercase').checked : false;
@@ -29,7 +49,7 @@ function generatePassword() {
         calculateCrackTime(passphrase.trim());
         checkCommonPassword(passphrase.trim());
         saveToHistory(passphrase.trim());
-        updateBackgroundColor(passphrase.trim());
+        loader.style.display = 'none';
         return;
     } else if (type === 'pin') {
         allowedChars += '0123456789';
@@ -45,59 +65,28 @@ function generatePassword() {
         password += allowedChars[randomIndex];
     }
 
-    typeWriterEffect(password);
-    calculateEntropy(password);
+    document.getElementById('password').value = password;
+    updateStrengthMeter(password);
+    const entropy = calculateEntropy(password);
+    const uniquenessScore = calculateUniquenessScore(password);
+    const crackTimeScore = calculateCrackTimeScore(password);
+    createRadarChart(password.length, entropy, uniquenessScore, crackTimeScore);
     calculateCrackTime(password);
     checkCommonPassword(password);
     saveToHistory(password);
-    updateBackgroundColor(password);
+    loader.style.display = 'none';
 }
 
-function typeWriterEffect(text) {
-    const passwordInput = document.getElementById('password');
-    passwordInput.value = '';
-    passwordInput.classList.add('typewriter');
-    let i = 0;
-    const typing = setInterval(() => {
-        if (i < text.length) {
-            passwordInput.value += text.charAt(i);
-            createRippleEffect(passwordInput, text.charAt(i));
-            i++;
-        } else {
-            clearInterval(typing);
-            passwordInput.classList.remove('typewriter');
-        }
-    }, 100);
+function calculateUniquenessScore(password) {
+    const uniqueChars = new Set(password).size;
+    const totalChars = password.length;
+    return (uniqueChars / totalChars) * 100;
 }
 
-function createRippleEffect(input, char) {
-    const ripple = document.createElement('div');
-    ripple.classList.add('ripple');
-    input.parentNode.appendChild(ripple);
-
-    // Position the ripple at the cursor
-    const rect = input.getBoundingClientRect();
-    ripple.style.left = `${rect.left + window.scrollX}px`;
-    ripple.style.top = `${rect.top + window.scrollY}px`;
-
-    // Special effects for special characters
-    if (/[!@#$%^&*()_+~`|}{[\]:;?><,./-=]/.test(char)) {
-        createFireworkEffect(ripple);
-    }
-
-    setTimeout(() => {
-        ripple.remove();
-    }, 1000);
-}
-
-function createFireworkEffect(element) {
-    const firework = document.createElement('div');
-    firework.classList.add('firework');
-    element.appendChild(firework);
-
-    setTimeout(() => {
-        firework.remove();
-    }, 1000);
+function calculateCrackTimeScore(password) {
+    const entropy = calculateEntropy(password);
+    const maxEntropy = Math.log2(Math.pow(94, password.length)); // Assuming 94 possible characters
+    return (entropy / maxEntropy) * 100;
 }
 
 function updateStrengthMeter(password) {
@@ -109,20 +98,20 @@ function updateStrengthMeter(password) {
     if (/[^A-Za-z0-9]/.test(password)) strength += 1;
 
     const strengthMeter = document.getElementById('strength');
-    const width = (strength / 5) * 100;
-    strengthMeter.style.width = `${width}%`;
+    const strengthPercentage = (strength / 5) * 100;
 
-    if (width < 40) {
+    // Use GSAP to animate the strength meter
+    gsap.fromTo("#strength",
+        { width: "0%" },
+        { width: `${strengthPercentage}%`, duration: 0.7, ease: "elastic.out(1, 0.5)" }
+    );
+
+    if (strengthPercentage < 40) {
         strengthMeter.style.backgroundColor = '#ff4444';
-    } else if (width < 80) {
+    } else if (strengthPercentage < 80) {
         strengthMeter.style.backgroundColor = '#ffbb33';
     } else {
         strengthMeter.style.backgroundColor = '#0f0';
-    }
-
-    // Trigger particle effects based on strength increase
-    if (width > 80) {
-        createParticles();
     }
 }
 
@@ -130,6 +119,7 @@ function showOptions(type) {
     document.getElementById('password-options').style.display = 'none';
     document.getElementById('passphrase-options').style.display = 'none';
     document.getElementById('pin-options').style.display = 'none';
+    document.getElementById('phonetic-options').style.display = 'none';
 
     if (type === 'password') {
         document.getElementById('password-options').style.display = 'flex';
@@ -137,6 +127,8 @@ function showOptions(type) {
         document.getElementById('passphrase-options').style.display = 'flex';
     } else if (type === 'pin') {
         document.getElementById('pin-options').style.display = 'flex';
+    } else if (type === 'phonetic') {
+        document.getElementById('phonetic-options').style.display = 'flex';
     }
 }
 
@@ -188,6 +180,32 @@ function checkCommonPassword(password) {
     }
 }
 
+function createRadarChart(length, entropy, uniquenessScore, crackTimeScore) {
+    const ctx = document.getElementById('entropyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Length', 'Entropy', 'Uniqueness', 'Crack Time'],
+            datasets: [{
+                data: [length, entropy, uniquenessScore, crackTimeScore],
+                backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                borderColor: '#4361ee'
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            }
+        }
+    });
+}
+
 function saveToHistory(password) {
     const timestamp = new Date().toLocaleString();
     const historyItem = { password, timestamp };
@@ -207,26 +225,6 @@ function updateHistoryDisplay() {
         listItem.textContent = `${item.timestamp}: ${item.password}`;
         historyList.appendChild(listItem);
     });
-}
-
-function loadHistory() {
-    const storedHistory = localStorage.getItem('passwordHistory');
-    if (storedHistory) {
-        passwordHistory = JSON.parse(storedHistory);
-        updateHistoryDisplay();
-    }
-}
-
-function regenerateLastPassword() {
-    if (passwordHistory.length > 0) {
-        const lastPassword = passwordHistory[0].password;
-        document.getElementById('password').value = lastPassword;
-        calculateEntropy(lastPassword);
-        calculateCrackTime(lastPassword);
-        checkCommonPassword(lastPassword);
-    } else {
-        showPopup('No password history available!');
-    }
 }
 
 function saveToArchive() {
@@ -257,31 +255,15 @@ function generateQRCode() {
 }
 
 function openPasswordVault() {
-    if (passwordHistory.length > 0) {
-        const passwords = passwordHistory.map(item => `${item.timestamp}: ${item.password}`).join('\n');
-        showPopup(`Password Vault:\n${passwords}`);
-    } else {
-        showPopup('Password Vault is empty!');
-    }
+    showPopup('Password Vault: ' + passwordHistory.map(item => item.password).join(', '));
 }
 
 function simulateBreachScan() {
-    const password = document.getElementById('password').value;
-    if (password) {
-        const entropy = calculateEntropy(password);
-        const strength = (entropy / Math.log2(Math.pow(94, password.length))) * 100;
-        let message = `Breach Scan Simulation:\nPassword: ${password}\nEntropy: ${entropy.toFixed(2)} bits\nStrength: ${strength.toFixed(2)}%`;
-        if (strength < 50) {
-            message += '\nWarning: Password is weak!';
-        } else if (strength < 80) {
-            message += '\nNote: Password is moderate.';
-        } else {
-            message += '\nNote: Password is strong!';
-        }
-        showPopup(message);
-    } else {
-        showPopup('No password to simulate breach scan!');
-    }
+    showPopup('Simulating Breach Scan...');
+}
+
+function transferData() {
+    showPopup('Data Transfer initiated...');
 }
 
 function showPopup(message) {
@@ -293,114 +275,4 @@ function showPopup(message) {
 
 function closePopup() {
     document.getElementById('popup').style.display = 'none';
-}
-
-function createJapaneseLetterFallingAnimation() {
-    const letters = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
-    const background = document.querySelector('.background-animation');
-    const letterCount = 100;
-
-    for (let i = 0; i < letterCount; i++) {
-        const letter = document.createElement('div');
-        letter.classList.add('japanese-letter');
-        letter.textContent = letters[Math.floor(Math.random() * letters.length)];
-        letter.style.left = Math.random() * 100 + 'vw';
-        letter.style.top = -10 + 'px';
-        letter.style.animationDuration = (Math.random() * 5 + 5) + 's';
-        letter.style.animationDelay = Math.random() * 5 + 's';
-        background.appendChild(letter);
-    }
-}
-
-function createParticles() {
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const particles = [];
-    const particleCount = 50;
-
-    for (let i = 0; i < particleCount; i++) {
-        particles.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 3 + 1,
-            speedX: Math.random() * 2 - 1,
-            speedY: Math.random() * 2 - 1,
-            color: `hsl(${Math.random() * 60 + 100}, 100%, 50%)`
-        });
-    }
-
-    function drawParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(particle => {
-            ctx.fillStyle = particle.color;
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            particle.x += particle.speedX;
-            particle.y += particle.speedY;
-
-            if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
-            if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
-        });
-        requestAnimationFrame(drawParticles);
-    }
-
-    drawParticles();
-}
-
-function updateBackgroundColor(password) {
-    const strength = calculateEntropy(password);
-    const hue = Math.min(120, strength * 3); // Scale strength to hue (0-120)
-    document.body.style.backgroundColor = `hsl(${hue}, 100%, 10%)`;
-}
-
-function generateSVGPattern(password) {
-    // Simple hash function to generate a seed for the SVG pattern
-    let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-        hash = password.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    // Use the hash to generate a simple SVG pattern
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "100%");
-    svg.setAttribute("height", "100%");
-
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("width", "100%");
-    rect.setAttribute("height", "100%");
-    rect.setAttribute("fill", `hsl(${hash % 360}, 100%, 50%)`);
-    svg.appendChild(rect);
-
-    // Add some circles based on the hash
-    for (let i = 0; i < 10; i++) {
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", `${(hash % 100) + i * 10}%`);
-        circle.setAttribute("cy", `${(hash % 100) + i * 10}%`);
-        circle.setAttribute("r", `${(hash % 50) / 10}%`);
-        circle.setAttribute("fill", `hsl(${(hash + i * 36) % 360}, 100%, 50%)`);
-        svg.appendChild(circle);
-    }
-
-    document.body.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg.outerHTML)}')`;
-}
-
-window.onload = function() {
-    createJapaneseLetterFallingAnimation();
-    loadHistory();
-    adjustCanvasSize();
-};
-
-window.onresize = function() {
-    adjustCanvasSize();
-};
-
-function adjustCanvasSize() {
-    const canvas = document.getElementById('particle-canvas');
-    const container = document.querySelector('.container');
-    canvas.width = container.offsetWidth;
-    canvas.height = 100;
 }
