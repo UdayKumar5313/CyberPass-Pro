@@ -1,85 +1,813 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberPass Pro</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure Password Generator</title>
+  
+  <!-- React & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.1); }
+    }
+    
+    .dna-visualization {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      perspective: 400px;
+    }
+    
+    .dna-segment {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(var(--angle)) translateY(20px);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    
+    .dna-segment.uppercase { background-color: rgba(0, 100, 255, 0.3); }
+    .dna-segment.lowercase { background-color: rgba(0, 255, 100, 0.3); }
+    .dna-segment.number { background-color: rgba(255, 200, 0, 0.3); }
+    .dna-segment.symbol { background-color: rgba(255, 0, 0, 0.3); }
+    
+    .hologram-password {
+      font-family: monospace;
+      font-size: 24px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6, #6366f1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 
+        0 0 5px #fff,
+        0 0 10px #06b6d4,
+        0 0 20px #3b82f6;
+      animation: neon-flicker 1.5s infinite alternate;
+    }
+    
+    @keyframes neon-flicker {
+      0%, 100% { 
+        text-shadow: 0 0 5px #fff, 0 0 10px #06b6d4, 0 0 20px #3b82f6;
+        opacity: 1;
+      }
+      50% { 
+        text-shadow: 0 0 5px #fff, 0 0 10px #06b6d4, 0 0 20px #3b82f6;
+        opacity: 0.8;
+      }
+    }
+    
+    .terminal-password span {
+      display: inline-block;
+      animation: flicker 0.3s infinite;
+    }
+    
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .dna-segment {
+      --angle: 0deg;
+    }
+    
+    .dna-segment.uppercase { background-color: rgba(0, 100, 255, 0.3); }
+    .dna-segment.lowercase { background-color: rgba(0, 255, 100, 0.3); }
+    .dna-segment.number { background-color: rgba(255, 200, 0, 0.3); }
+    .dna-segment.symbol { background-color: rgba(255, 0, 0, 0.3); }
+    
+    .neon-password {
+      font-family: monospace;
+      font-size: 24px;
+    }
+    
+    .animate-orbit {
+      animation: orbit 5s linear infinite;
+    }
+    
+    @keyframes orbit {
+      0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+      100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+    }
+  </style>
 </head>
-<body>
-    <div class="background-animation"></div>
-    <div class="container">
-        <div class="header">
-            <h1>CyberPass Pro</h1>
-            <p class="version">Ver. XG-8</p>
-            <p class="tagline">Forge Unbreakable Access Codes // Secure Your Digital Domain</p>
-        </div>
-        <div class="password-display">
-            <label for="password" id="passwordLabel">Password</label>
-            <input type="text" id="password" readonly>
-        </div>
-        <div class="strength-meter">
-            <p>Strength Analysis: Military Grade Encryption</p>
-            <div id="strength"></div>
-            <p id="strength-score">ZXCVBN Score: 4/4</p>
-        </div>
-        <div class="options">
-            <div class="option-group">
-                <label><input type="radio" name="type" value="password" checked onclick="showOptions('password')"> Password</label>
-                <label><input type="radio" name="type" value="passphrase" onclick="showOptions('passphrase')"> Passphrase</label>
-                <label><input type="radio" name="type" value="pin" onclick="showOptions('pin')"> PIN Code</label>
-                <label><input type="radio" name="type" value="phonetic" onclick="showOptions('phonetic')"> Phonetic</label>
+<body class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center p-4 sm:p-8 overflow-hidden relative">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    function App() {
+      const [password, setPassword] = useState('');
+      const [length, setLength] = useState(16);
+      const [includeUppercase, setIncludeUppercase] = useState(true);
+      const [includeLowercase, setIncludeLowercase] = useState(true);
+      const [includeNumbers, setIncludeNumbers] = useState(true);
+      const [includeSymbols, setIncludeSymbols] = useState(true);
+      const [isGenerating, setIsGenerating] = useState(false);
+      const [copied, setCopied] = useState(false);
+      const [strength, setStrength] = useState(0);
+      const [strengthText, setStrengthText] = useState('Very Weak');
+      const [strengthColor, setStrengthColor] = useState('bg-red-500');
+      const [crackTime, setCrackTime] = useState('Instant');
+      const [percentage, setPercentage] = useState(0);
+      const [recipe, setRecipe] = useState('');
+      const [showDna, setShowDna] = useState(false);
+      const [hologramMode, setHologramMode] = useState(false);
+      const [showAiFeedback, setShowAiFeedback] = useState(false);
+      const [aiFeedback, setAiFeedback] = useState('');
+      const [activeTab, setActiveTab] = useState('generator');
+      const [dnaSequence, setDnaSequence] = useState('');
+      const generationTimeouts = useRef([]);
+
+      // Calculate strength segments for the meter
+      const getStrengthSegments = () => {
+        return Math.max(0, Math.min(4, Math.floor((strength / 7) * 4)));
+      };
+
+      // Generate password recipe
+      const generateRecipe = (password) => {
+        if (!password) return;
+        
+        const recipe = {
+          uppercase: 0,
+          lowercase: 0,
+          numbers: 0,
+          symbols: 0
+        };
+        
+        password.split('').forEach(char => {
+          if (/[A-Z]/.test(char)) recipe.uppercase++;
+          else if (/[a-z]/.test(char)) recipe.lowercase++;
+          else if (/\d/.test(char)) recipe.numbers++;
+          else recipe.symbols++;
+        });
+        
+        setRecipe(`16 chars: ${recipe.uppercase}U, ${recipe.lowercase}L, ${recipe.numbers}N, ${recipe.symbols}S`);
+      };
+
+      // Password generation logic
+      const generatePassword = () => {
+        // Clear existing timeouts
+        generationTimeouts.current.forEach(timeout => clearTimeout(timeout));
+        generationTimeouts.current = [];
+        
+        // Reset percentage
+        setPercentage(0);
+        setIsGenerating(true);
+        
+        // Character sets based on selected options
+        const chars = [];
+        if (includeUppercase) chars.push(...'ABCDEFGHJKLMNPQRSTUVWXYZ');
+        if (includeLowercase) chars.push(...'abcdefghjklmnpqrstuvwxyz');
+        if (includeNumbers) chars.push(...'23456789');
+        if (includeSymbols) chars.push(...'!@#$%^&*()_+{}[]=<>,.?/~`-');
+        
+        if (chars.length === 0) {
+          setPassword('Please select at least one character type');
+          setIsGenerating(false);
+          return;
+        }
+        
+        let currentPassword = '';
+        const delay = 100;
+        
+        for (let i = 0; i < length; i++) {
+          generationTimeouts.current.push(
+            setTimeout(() => {
+              const randomIndex = Math.floor(Math.random() * chars.length);
+              currentPassword += chars[randomIndex];
+              setPassword(currentPassword);
+              
+              // Calculate and set percentage
+              const currentPercentage = Math.floor(((i + 1) / length) * 100);
+              setPercentage(currentPercentage);
+              
+              // When generation is complete
+              if (i === length - 1) {
+                setTimeout(() => {
+                  setIsGenerating(false);
+                  updatePasswordAnalysis(currentPassword);
+                }, 500);
+              }
+            }, i * delay)
+          );
+        }
+      };
+
+      // Update password analysis
+      const updatePasswordAnalysis = (password) => {
+        if (!password) return;
+        
+        const score = calculateStrength(password);
+        setStrength(score);
+        
+        const { level, color } = getStrengthLevel(score);
+        setStrengthText(level);
+        setStrengthColor(color);
+        setCrackTime(calculateCrackTime(password));
+        generateRecipe(password);
+        generateDnaSequence(password);
+      };
+
+      // Calculate strength
+      const calculateStrength = (password) => {
+        if (password.length < 8) return 0;
+        
+        let score = 0;
+        if (password.length >= 8) score += 1;
+        if (password.length >= 12) score += 1;
+        if (password.length >= 16) score += 1;
+        
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSymbol = /[!@#$%^&*()_+{}[\]<>,.?/~`-]/.test(password);
+        
+        const variety = [hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length;
+        score += variety;
+        
+        return Math.min(score, 7);
+      };
+
+      // Get strength level
+      const getStrengthLevel = (score) => {
+        if (score <= 2) return { level: 'Very Weak', color: 'bg-red-500' };
+        if (score <= 4) return { level: 'Weak', color: 'bg-orange-500' };
+        if (score <= 6) return { level: 'Medium', color: 'bg-yellow-500' };
+        return { level: 'Strong', color: 'bg-green-500' };
+      };
+
+      // Calculate crack time
+      const calculateCrackTime = (password) => {
+        const charSets = [
+          { regex: /[A-Z]/, size: 26 },
+          { regex: /[a-z]/, size: 26 },
+          { regex: /\d/, size: 10 },
+          { regex: /[!@#$%^&*()_+{}[\]<>,.?/~`-]/, size: 32 }
+        ];
+
+        let charSetSize = 0;
+        charSets.forEach(set => {
+          if (set.regex.test(password)) charSetSize += set.size;
+        });
+
+        if (charSetSize === 0) return 'Instant';
+
+        const length = password.length;
+        const combinations = Math.pow(charSetSize, length);
+        const guessesPerSecond = 1e9;
+        const seconds = combinations / guessesPerSecond;
+
+        const units = [
+          { divisor: 31536000, suffix: 'y' },
+          { divisor: 604800, suffix: 'w' },
+          { divisor: 86400, suffix: 'd' },
+          { divisor: 3600, suffix: 'h' },
+          { divisor: 60, suffix: 'm' },
+          { divisor: 1, suffix: 's' }
+        ];
+
+        for (const unit of units) {
+          if (seconds >= unit.divisor) {
+            const value = Math.floor(seconds / unit.divisor);
+            return `${value}${unit.suffix}`;
+          }
+        }
+        
+        return 'Instant';
+      };
+
+      // Generate DNA sequence from password
+      const generateDnaSequence = (password) => {
+        const dnaMap = {
+          'A': 'AT', 'T': 'TA', 'C': 'CG', 'G': 'GC',
+          '0': 'AT', '1': 'TA', '2': 'CG', '3': 'GC',
+          '4': 'AT', '5': 'TA', '6': 'CG', '7': 'GC',
+          '8': 'AT', '9': 'TA'
+        };
+        
+        const sequence = password.split('').map(char => {
+          const key = Object.keys(dnaMap).find(k => k === char) || 'A';
+          return dnaMap[key];
+        }).join('');
+        
+        setDnaSequence(sequence);
+      };
+
+      // Copy to clipboard logic
+      const copyToClipboard = () => {
+        if (!password || isGenerating) return;
+
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(password)
+            .then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            })
+            .catch(err => {
+              console.error('Clipboard API failed:', err);
+              fallbackCopy();
+            });
+        } else {
+          fallbackCopy();
+        }
+      };
+
+      const fallbackCopy = () => {
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = password;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          
+          if (navigator.userAgent.match(/ipad|iphone/i)) {
+            textarea.contentEditable = true;
+            textarea.readOnly = false;
+            const range = document.createRange();
+            range.selectNodeContents(textarea);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            textarea.setSelectionRange(0, 999999);
+          } else {
+            textarea.select();
+          }
+          
+          document.execCommand('copy');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          document.body.removeChild(textarea);
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+          alert('Copy failed. Please manually copy the password from the box above.');
+        }
+      };
+
+      // Simulated AI analysis
+      const toggleAiFeedback = () => {
+        if (!password || isGenerating) return;
+        
+        if (!showAiFeedback) {
+          const analysis = [];
+          
+          if (password.length < 12) analysis.push('Your password is below recommended length');
+          if (includeUppercase) analysis.push('Uppercase present - good for complexity');
+          if (includeLowercase) analysis.push('Lowercase present - good for complexity');
+          if (includeNumbers) analysis.push('Numbers present - improves security');
+          if (includeSymbols) analysis.push('Symbols present - excellent security');
+          
+          setAiFeedback(analysis.join('\n'));
+          setShowAiFeedback(true);
+        } else {
+          setShowAiFeedback(false);
+        }
+      };
+
+      // Hologram animation
+      useEffect(() => {
+        if (!hologramMode) return;
+        
+        const interval = setInterval(() => {
+          // This effect is handled by CSS animation
+        }, 50);
+        
+        return () => clearInterval(interval);
+      }, [hologramMode]);
+
+      // Password strength calculation
+      useEffect(() => {
+        if (!password) return;
+        updatePasswordAnalysis(password);
+      }, [password]);
+
+      // Clean up timeouts
+      useEffect(() => {
+        return () => {
+          generationTimeouts.current.forEach(timeout => clearTimeout(timeout));
+        };
+      }, []);
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center p-4 sm:p-8 overflow-hidden relative">
+          {/* Cybersecurity-themed background */}
+          <div className="fixed inset-0 z-0">
+            {/* Hex grid pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%" className="hex-pattern">
+                <defs>
+                  <pattern id="hex" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M20 0l10 17.32-10 17.32-20 0 10-17.32 10-17.32z" fill="none" stroke="rgba(0, 255, 255, 0.1)" strokeWidth="0.5" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#hex)" />
+              </svg>
             </div>
-            <div id="password-options" class="option-group">
-                <label><input type="checkbox" id="uppercase" checked> Caps (A-Z)</label>
-                <label><input type="checkbox" id="lowercase" checked> Low (a-z)</label>
-                <label><input type="checkbox" id="numbers" checked> Nums (0-9)</label>
-                <label><input type="checkbox" id="symbols" checked> Syms (!@#)</label>
+            
+            {/* Network grid */}
+            <div className="fixed inset-0 z-0 overflow-hidden">
+              <div className="network-container">
+                {/* Floating nodes */}
+                {[...Array(20)].map((_, i) => (
+                  <div 
+                    key={i}
+                    className="absolute rounded-full bg-cyan-500/30 animate-float"
+                    style={{
+                      width: `${Math.random() * 10 + 3}px`,
+                      height: `${Math.random() * 10 + 3}px`,
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      animationDuration: `${Math.random() * 5 + 5}s`,
+                      animationDelay: `${Math.random() * 5}s`
+                    }}
+                  ></div>
+                ))}
+              </div>
             </div>
-            <div id="passphrase-options" class="option-group" style="display: none;">
-                <label><input type="checkbox" id="include-words"> Include Words</label>
-                <label><input type="checkbox" id="include-numbers"> Include Numbers</label>
+          </div>
+          
+          {/* Main UI Container */}
+          <div className="relative z-10 w-full h-full flex items-center justify-center p-4">
+            <div className="w-full max-w-2xl bg-gray-800 bg-opacity-90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-cyan-500/20">
+              {/* Header */}
+              <div className="p-10 text-center border-b border-gray-700">
+                <h1 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center justify-center">
+                  <svg className="w-12 h-12 mr-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1-7.778-7.778z" />
+                  </svg>
+                  Secure Password Generator
+                </h1>
+                <p className="mt-4 text-2xl text-gray-300">Create strong, secure passwords in seconds</p>
+              </div>
+              
+              {/* Password Display */}
+              <div className="px-10 pb-10">
+                <div className="relative">
+                  <div className="bg-gray-700 rounded-2xl p-8 min-h-[160px] flex items-center justify-between">
+                    <div className={`font-mono text-3xl overflow-x-auto ${hologramMode ? 'hologram-password' : ''}`}>
+                      {password ? (
+                        <span className="inline-block animate-[fadeInUp_0.5s_ease-in-out]">
+                          {password}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">Your password will appear here</span>
+                      )}
+                    </div>
+                    
+                    {password && !isGenerating && (
+                      <button 
+                        onClick={copyToClipboard}
+                        disabled={copied}
+                        className={`ml-4 p-4 rounded-xl transition-all duration-200 ${
+                          copied 
+                            ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' 
+                            : 'bg-gray-600 hover:bg-gray-500'
+                        }`}
+                        aria-label={copied ? "Copied!" : "Copy to clipboard"}
+                      >
+                        {copied ? (
+                          <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        ) : (
+                          <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2v1" />
+                          </svg>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Stable Loading Animation with Percentage */}
+                  {isGenerating && (
+                    <div className="mt-6">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-lg font-medium">Generating Password</span>
+                        <span className="text-lg font-medium">
+                          <span className="inline-block w-16 text-center bg-gray-700 rounded px-2 py-1">
+                            {percentage}%
+                          </span>
+                        </span>
+                      </div>
+                      <div className="h-4 rounded-full bg-gray-700 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 ease-out"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Security Metrics */}
+                  {password && !isGenerating && (
+                    <div className="mt-8 space-y-6">
+                      {/* Recipe Display */}
+                      <div className="bg-gray-700 p-4 rounded-lg">
+                        <h3 className="font-semibold text-cyan-400 mb-2">Password Recipe</h3>
+                        <div className="text-sm text-gray-300 font-mono break-all">
+                          {recipe || 'Recipe: 0U, 0L, 0N, 0S'}
+                        </div>
+                      </div>
+                      
+                      {/* Strength Meter */}
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-lg font-medium">Password Strength</span>
+                          <span className={`text-lg font-medium ${strengthColor}`}>
+                            {strengthText}
+                          </span>
+                        </div>
+                        <div className="flex space-x-2 h-5">
+                          {[0, 1, 2, 3].map((index) => (
+                            <div
+                              key={index}
+                              className={`flex-1 rounded-full h-full transition-all duration-500 ${
+                                index < getStrengthSegments() ? strengthColor : 'bg-gray-600'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <div className="mt-3 text-sm text-gray-400">
+                          {strengthText === 'Very Weak' && 'Your password is very weak. Consider adding more characters and complexity.'}
+                          {strengthText === 'Weak' && 'Your password is weak. Add more character types for better security.'}
+                          {strengthText === 'Medium' && 'Your password is medium strength. Add symbols or increase length for better security.'}
+                          {strengthText === 'Strong' && 'Your password is strong. This is a secure password.'}
+                        </div>
+                      </div>
+                      
+                      {/* Crack Time */}
+                      <div className="flex items-center justify-between bg-gray-700 p-6 rounded-xl mt-6">
+                        <div className="flex items-center">
+                          <svg className="w-8 h-8 mr-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          <div>
+                            <p className="text-sm text-gray-400">Estimated Crack Time</p>
+                            <p className="text-2xl font-bold">{crackTime}</p>
+                          </div>
+                        </div>
+                        <div className="text-right text-sm text-gray-400">
+                          Brute-force attacks<br />
+                          1B guesses/sec
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Loading Animation Ring */}
+                  {isGenerating && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="relative w-24 h-24">
+                        <div className="absolute inset-0 rounded-full border-4 border-blue-400 border-t-transparent animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xl font-bold text-cyan-400 drop-shadow-lg">
+                            {percentage}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Settings */}
+              <div className="px-10 pb-10">
+                <div className="space-y-8">
+                  <div>
+                    <label className="block text-lg font-medium text-gray-200 mb-4">
+                      Password Length: {length}
+                    </label>
+                    <input
+                      type="range"
+                      min="8"
+                      max="64"
+                      value={length}
+                      onChange={(e) => setLength(parseInt(e.target.value))}
+                      className="w-full h-4 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <label className="flex items-center space-x-4 bg-gray-700 p-5 rounded-xl hover:bg-gray-600 transition-colors duration-200">
+                      <input
+                        type="checkbox"
+                        checked={includeUppercase}
+                        onChange={() => setIncludeUppercase(!includeUppercase)}
+                        className="form-checkbox h-7 w-7 text-cyan-500 rounded focus:ring-cyan-500"
+                      />
+                      <span className="text-xl">Uppercase (A-Z)</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-4 bg-gray-700 p-5 rounded-xl hover:bg-gray-600 transition-colors duration-200">
+                      <input
+                        type="checkbox"
+                        checked={includeLowercase}
+                        onChange={() => setIncludeLowercase(!includeLowercase)}
+                        className="form-checkbox h-7 w-7 text-cyan-500 rounded focus:ring-cyan-500"
+                      />
+                      <span className="text-xl">Lowercase (a-z)</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-4 bg-gray-700 p-5 rounded-xl hover:bg-gray-600 transition-colors duration-200">
+                      <input
+                        type="checkbox"
+                        checked={includeNumbers}
+                        onChange={() => setIncludeNumbers(!includeNumbers)}
+                        className="form-checkbox h-7 w-7 text-cyan-500 rounded focus:ring-cyan-500"
+                      />
+                      <span className="text-xl">Numbers (0-9)</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-4 bg-gray-700 p-5 rounded-xl hover:bg-gray-600 transition-colors duration-200">
+                      <input
+                        type="checkbox"
+                        checked={includeSymbols}
+                        onChange={() => setIncludeSymbols(!includeSymbols)}
+                        className="form-checkbox h-7 w-7 text-cyan-500 rounded focus:ring-cyan-500"
+                      />
+                      <span className="text-xl">Symbols (!@#$%^&*)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Action buttons */}
+              <div className="px-10 pb-10">
+                <div className="flex flex-wrap gap-4 justify-center mb-6">
+                  <button 
+                    onClick={() => setHologramMode(!hologramMode)}
+                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors duration-200"
+                  >
+                    {hologramMode ? 'Disable Hologram' : 'Enable Hologram'}
+                  </button>
+                  
+                  <button 
+                    onClick={() => setShowDna(!showDna)}
+                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors duration-200"
+                  >
+                    {showDna ? 'Hide DNA' : 'Show DNA'}
+                  </button>
+                  
+                  <button 
+                    onClick={toggleAiFeedback}
+                    disabled={!password || isGenerating}
+                    className={`px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors duration-200 ${!password ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {showAiFeedback ? 'Hide Analysis' : 'Show Analysis'}
+                  </button>
+                </div>
+                
+                <button
+                  onClick={generatePassword}
+                  disabled={isGenerating}
+                  className={`
+                    w-full py-5 px-8 rounded-xl font-bold text-xl text-white
+                    bg-gradient-to-r from-cyan-600 to-blue-600
+                    hover:from-cyan-500 hover:to-blue-500
+                    focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900
+                    transition-all duration-300 transform
+                    ${isGenerating ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30'}
+                  `}
+                >
+                  <div className="flex items-center justify-center">
+                    {isGenerating ? (
+                      <>
+                        <svg className="w-8 h-8 mr-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                        </svg>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-8 h-8 mr-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1-7.778-7.778z" />
+                        </svg>
+                        Generate Password
+                      </>
+                    )}
+                  </div>
+                </button>
+              </div>
+              
+              {/* AI Analysis Modal */}
+              {showAiFeedback && password && (
+                <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+                  <div className="absolute top-4 right-4">
+                    <button 
+                      onClick={() => setShowAiFeedback(false)}
+                      className="p-2 bg-gray-700 hover:bg-gray-600 rounded-full"
+                    >
+                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="max-w-2xl w-full p-8">
+                    <h2 className="text-2xl font-bold text-center mb-6">AI Security Analysis</h2>
+                    <div className="bg-gray-700 p-6 rounded-lg min-h-[200px]">
+                      <div className="text-sm text-gray-300 font-mono">
+                        {aiFeedback || 'Click "Show Analysis" to get security feedback'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* DNA Visualization Modal */}
+              {showDna && password && (
+                <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+                  <div className="absolute top-4 right-4">
+                    <button 
+                      onClick={() => setShowDna(false)}
+                      className="p-2 bg-gray-700 hover:bg-gray-600 rounded-full"
+                    >
+                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="max-w-2xl w-full p-8">
+                    <h2 className="text-2xl font-bold text-center mb-6">DNA Password Visualization</h2>
+                    <div className="h-64 relative mx-auto mb-6">
+                      <div className="dna-visualization">
+                        {password.split('').map((char, i) => {
+                          const type = 
+                            /[A-Z]/.test(char) ? 'uppercase' :
+                            /[a-z]/.test(char) ? 'lowercase' :
+                            /\d/.test(char) ? 'number' : 'symbol';
+                          
+                          return (
+                            <div 
+                              key={i} 
+                              className={`dna-segment ${type}`}
+                              style={{ 
+                                transform: `rotate(${i * 15}deg) translateY(20px)`,
+                                animation: `glow 2s ease-in-out ${i * 0.1}s infinite alternate`
+                              }}
+                            >
+                              {char}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-700 p-4 rounded-lg">
+                      <h3 className="font-semibold text-cyan-400 mb-2">Password Composition</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                          <span className="text-sm">Uppercase</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                          <span className="text-sm">Lowercase</span>
+                        </div>
+                        <div className="flex items-center mt-2">
+                          <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                          <span className="text-sm">Numbers</span>
+                        </div>
+                        <div className="flex items-center mt-2">
+                          <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                          <span className="text-sm">Symbols</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Developer Credit */}
+              <div className="fixed bottom-4 left-0 right-0 text-center">
+                <div className="text-sm text-gray-500 font-medium">Created by UDAY KUMAR</div>
+              </div>
             </div>
-            <div id="pin-options" class="option-group" style="display: none;">
-                <label><input type="checkbox" id="include-digits"> Include Digits</label>
-            </div>
-            <div id="phonetic-options" class="option-group" style="display: none;">
-                <label><input type="checkbox" id="include-phonetic"> Include Phonetic</label>
-            </div>
-            <div class="option-group">
-                <label>Glyph Count: <input type="number" id="length" min="4" max="32" value="20"></label>
-            </div>
+          </div>
         </div>
-        <div class="advanced-settings">
-            <p>Advanced Directives & Settings</p>
-            <div class="option-group">
-                <label><input type="checkbox" id="exclude-similar"> Exclude Similar Glyphs</label>
-            </div>
-        </div>
-        <button class="generate-btn" onclick="generatePassword()">Regenerate Access Code</button>
-        <div class="additional-features">
-            <button onclick="saveToArchive()">Code Archive (1)</button>
-            <button onclick="generateQRCode()">Transmit via QR</button>
-            <button onclick="openPasswordVault()">Password Vault</button>
-            <button onclick="simulateBreachScan()">Breach Scan (Sim)</button>
-            <button onclick="transferData()">Data Transfer</button>
-        </div>
-        <div class="password-history">
-            <h3>Password History</h3>
-            <ul id="password-history-list"></ul>
-        </div>
-        <canvas id="entropyChart"></canvas>
-        <div id="qrcode" style="display: none;"></div>
-    </div>
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <span class="close" onclick="closePopup()">&times;</span>
-            <p id="popup-message"></p>
-        </div>
-    </div>
-    <script src="script.js"></script>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
